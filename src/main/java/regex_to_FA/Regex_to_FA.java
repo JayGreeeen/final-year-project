@@ -12,40 +12,29 @@ public class Regex_to_FA {
 	private char[] chars;
 
 	// take in a regex and turn it into a FA
-
 	public FiniteAutomata convertToFA(String regex) {
 		chars = regex.toCharArray();
-		
+
 		boolean valid = validate(regex);
-		if (!valid){
+		if (!valid) {
 			System.out.println("Regex not valid");
 		} else {
 			System.out.println("building tree");
-			Node root = (new TreeBuilder()).generateTree(regex, bracketMap);
-//			System.out.println("root is: " + root.getText() + ". Root child count: " + root.getChildCount());
-//			Node node2 = root.getLeftChild();
-//			System.out.println("left child: " + node2.getText() + " Child count: " + node2.getChildCount());
-//			System.out.println("Left child " + node2.getLeftChild().getText());
-//			+ " " + root.getLeftChild().getText() + ", " + root.getRightChild().getText());
-			
+			Node root = (new Tree_Builder(regex)).buildTree();
+
 			PrintTree.print(root);
-			
-//			generateFA(root);
-			
 		}
 
-//		FiniteAutomata finiteAutomata = null;
+		// FiniteAutomata finiteAutomata = null;
 
 		return null;
 	}
 
-//	private void generateFA(Node root) {
-//
-//		// take in the root of the tree and generate the FA 
-//		
-//	}
-
-
+	// private void generateFA(Node root) {
+	//
+	// // take in the root of the tree and generate the FA
+	//
+	// }
 
 	private boolean validate(String regex) {
 		boolean bracketsMatch = validateBrackets(regex);
@@ -105,11 +94,11 @@ public class Regex_to_FA {
 					stack.push(i);
 				} else if (c == ')') {
 					if (stack.isEmpty()) {
-						return false; 
+						return false;
 						// regex is not valid - too many closing brackets
 					} else {
 						int key = stack.pop();
-						bracketMap.put(key, i); 
+						bracketMap.put(key, i);
 						// add the positions of the bracket pair to the map
 					}
 				}
