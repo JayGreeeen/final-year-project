@@ -1,20 +1,20 @@
 package regex_to_FA;
 
-public interface Node {
+public interface TreeNode {
 
-	public Node getParent();
+	public TreeNode getParent();
 
 	public String getText();
 
-	public void addChild(Node node);
+	public void addChild(TreeNode node);
 
-	public void setLeftChild(Node node);
+	public void setLeftChild(TreeNode node);
 
-	public Node getLeftChild();
+	public TreeNode getLeftChild();
 
-	public Node getRightChild();
+	public TreeNode getRightChild();
 
-	public void setParent(Node node);
+	public void setParent(TreeNode node);
 
 	public int getChildCount();
 
@@ -22,19 +22,19 @@ public interface Node {
 
 	public String toString();
 
-	public class ConcatNode implements Node {
-		private Node parent;
+	public class ConcatNode implements TreeNode {
+		private TreeNode parent;
 		private String text;
-		private Node leftChild;
-		private Node rightChild;
+		private TreeNode leftChild;
+		private TreeNode rightChild;
 		private int childCount = 0;
 
-		public ConcatNode(Node parent) {
+		public ConcatNode(TreeNode parent) {
 			text = "•";
 			this.parent = parent;
 		}
 
-		public void addChild(Node node) {
+		public void addChild(TreeNode node) {
 			if (leftChild == null) {
 				leftChild = node;
 			} else {
@@ -45,15 +45,15 @@ public interface Node {
 			childCount++;
 		}
 
-		public Node getLeftChild() {
+		public TreeNode getLeftChild() {
 			return leftChild;
 		}
 
-		public Node getRightChild() {
+		public TreeNode getRightChild() {
 			return rightChild;
 		}
 
-		public Node getParent() {
+		public TreeNode getParent() {
 			return parent;
 		}
 
@@ -61,7 +61,7 @@ public interface Node {
 			return text;
 		}
 
-		public void setParent(Node node) {
+		public void setParent(TreeNode node) {
 			this.parent = node;
 		}
 
@@ -69,7 +69,7 @@ public interface Node {
 			return childCount;
 		}
 
-		public void setLeftChild(Node node) {
+		public void setLeftChild(TreeNode node) {
 			leftChild = node;
 		}
 
@@ -86,32 +86,32 @@ public interface Node {
 
 	}
 
-	public class StarNode implements Node {
+	public class StarNode implements TreeNode {
 
-		private Node parent;
+		private TreeNode parent;
 		private String text;
-		private Node child;
+		private TreeNode child;
 		private int childCount = 0;
 
-		public StarNode(Node parent) {
+		public StarNode(TreeNode parent) {
 			text = "*";
 			this.parent = parent;
 		}
 
-		public void addChild(Node node) {
+		public void addChild(TreeNode node) {
 			child = node;
 			childCount++;
 		}
 
-		public void setParent(Node node) {
+		public void setParent(TreeNode node) {
 			this.parent = node;
 		}
 
-		public Node getChild() {
+		public TreeNode getChild() {
 			return child;
 		}
 
-		public Node getParent() {
+		public TreeNode getParent() {
 			return parent;
 		}
 
@@ -119,11 +119,11 @@ public interface Node {
 			return text;
 		}
 
-		public Node getLeftChild() {
+		public TreeNode getLeftChild() {
 			return child;
 		}
 
-		public Node getRightChild() {
+		public TreeNode getRightChild() {
 			// * node has no right child
 			return null;
 		}
@@ -132,7 +132,7 @@ public interface Node {
 			return childCount;
 		}
 
-		public void setLeftChild(Node node) {
+		public void setLeftChild(TreeNode node) {
 			child = node;
 		}
 
@@ -149,9 +149,9 @@ public interface Node {
 
 	}
 
-	public class LeafNode implements Node {
+	public class LeafNode implements TreeNode {
 
-		private Node parent;
+		private TreeNode parent;
 		private String text;
 
 		public LeafNode(String text) {
@@ -159,7 +159,7 @@ public interface Node {
 			// this.parent = parent;
 		}
 
-		public Node getParent() {
+		public TreeNode getParent() {
 			return parent;
 		}
 
@@ -167,18 +167,18 @@ public interface Node {
 			return text;
 		}
 
-		public void addChild(Node node) {
+		public void addChild(TreeNode node) {
 		}
 
-		public void setParent(Node node) {
+		public void setParent(TreeNode node) {
 			this.parent = node;
 		}
 
-		public Node getLeftChild() {
+		public TreeNode getLeftChild() {
 			return null;
 		}
 
-		public Node getRightChild() {
+		public TreeNode getRightChild() {
 			return null;
 		}
 
@@ -187,7 +187,7 @@ public interface Node {
 			return 0;
 		}
 
-		public void setLeftChild(Node node) {
+		public void setLeftChild(TreeNode node) {
 		}
 
 		public boolean parentSet() {
@@ -203,11 +203,11 @@ public interface Node {
 
 	}
 
-	public class UnionNode implements Node {
+	public class UnionNode implements TreeNode {
 
-		private Node parent;
-		private Node leftChild;
-		private Node rightChild;
+		private TreeNode parent;
+		private TreeNode leftChild;
+		private TreeNode rightChild;
 		private int childCount;
 		private String text;
 
@@ -215,7 +215,7 @@ public interface Node {
 			text = "|";
 		}
 
-		public Node getParent() {
+		public TreeNode getParent() {
 			return parent;
 		}
 
@@ -223,7 +223,7 @@ public interface Node {
 			return text;
 		}
 
-		public void addChild(Node node) {
+		public void addChild(TreeNode node) {
 			if (leftChild == null) {
 				leftChild = node;
 			} else {
@@ -232,15 +232,15 @@ public interface Node {
 			childCount++;
 		}
 
-		public Node getLeftChild() {
+		public TreeNode getLeftChild() {
 			return leftChild;
 		}
 
-		public Node getRightChild() {
+		public TreeNode getRightChild() {
 			return rightChild;
 		}
 
-		public void setParent(Node node) {
+		public void setParent(TreeNode node) {
 			// System.out.println("Setting left child of | to " + node);
 			parent = node;
 		}
@@ -249,7 +249,7 @@ public interface Node {
 			return childCount;
 		}
 
-		public void setLeftChild(Node node) {
+		public void setLeftChild(TreeNode node) {
 			leftChild = node;
 		}
 

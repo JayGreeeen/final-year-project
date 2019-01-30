@@ -2,12 +2,12 @@ package regex_to_FA;
 
 public class PrintTree {
 
-	public static void print(Node node){
+	public static void print(TreeNode node){
 		recursivePrint(node, -1);	
 		System.out.println("");
 	}
 	
-	private static void recursivePrint(Node node, int counter){
+	private static void recursivePrint(TreeNode node, int counter){
 		if (node != null){
 			counter++;
 			if (node.getRightChild() != null){

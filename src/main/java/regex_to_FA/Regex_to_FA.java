@@ -6,6 +6,10 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
+import regex_to_FA.TreeNode.ConcatNode;
+import regex_to_FA.TreeNode.LeafNode;
+import regex_to_FA.TreeNode.UnionNode;
+
 public class Regex_to_FA {
 
 	private Map<Integer, Integer> bracketMap = new HashMap<Integer, Integer>();
@@ -20,7 +24,7 @@ public class Regex_to_FA {
 			System.out.println("Regex not valid");
 		} else {
 			System.out.println("building tree");
-			Node root = (new Tree_Builder(regex)).buildTree();
+			TreeNode root = (new Tree_Builder(regex)).buildTree();
 
 			PrintTree.print(root);
 		}
@@ -29,12 +33,55 @@ public class Regex_to_FA {
 
 		return null;
 	}
+	
+//	Takes in a node
+//
+//	If node == leaf
+//		Create NFA using second rule, for single expression char
+//	Else //not leaf – parent node which has an operator
+//		
+//		Generate NFA for my left child
+//
+//	If operation == *
+//		Use rule 5 to connect child node
+//		Return NFA
+//	Else
+//		Generate NFA for my right child
+//
+//		If operation == |
+//			Use rule 3 to connect child NFAs
+//		Else if operation == •
+//			Use rule 4 to connect child NFAs
+//		Return NFA
 
-	// private void generateFA(Node root) {
-	//
-	// // take in the root of the tree and generate the FA
-	//
-	// }
+
+	 private void generateFA(TreeNode node) {
+	
+	 // take in the root of the tree and generate the FA
+		 
+		 if (node instanceof LeafNode){
+			 
+			 // create NFA using second rule 
+			 // return fa
+			 
+		 } else {
+			 // not a leaf node
+			 
+			 // generate FA for right child 
+			 
+			 if (node instanceof UnionNode){
+				 // use rule 3 to connect child NFAs
+				 
+			 } else if (node instanceof ConcatNode){
+				 // use rule 4 to connect child NFAs
+				 
+			 }
+			 
+			 // return fa
+			 
+		 }
+	
+	 }
 
 	private boolean validate(String regex) {
 		boolean bracketsMatch = validateBrackets(regex);
