@@ -27,7 +27,7 @@ public class State {
 		this.label = label;
 	}
 
-	public String hasTransitionTo(State state) {
+	public String getTransitionTo(State state) {
 		if (transitions.containsKey(state)) {
 			return transitions.get(state);
 		}

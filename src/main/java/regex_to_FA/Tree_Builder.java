@@ -9,17 +9,17 @@ public class Tree_Builder {
 
 	private String regex;
 	private Map<Integer, Integer> bracketMap;
-	private TreeNode root;
-	private Stack<TreeNode> parentStack;
+	private Tree_Node root;
+	private Stack<Tree_Node> parentStack;
 
 	public Tree_Builder(String regex) {
 		this.regex = regex;
 		bracketMap = generateBracketMap(regex);
 		root = null;
-		parentStack = new Stack<TreeNode>();
+		parentStack = new Stack<Tree_Node>();
 	}
 
-	public TreeNode buildTree() {
+	public Tree_Node buildTree() {
 		// System.out.println("Building tree for " + regex);
 		char[] chars = regex.toCharArray();
 
@@ -49,7 +49,7 @@ public class Tree_Builder {
 
 						// generate subtree for substring between brackets
 						String substr = regex.substring(i + 1, closingBracketPosition);
-						TreeNode subtree = generateSubtree(substr);
+						Tree_Node subtree = generateSubtree(substr);
 						// System.out.println("Generated subtree for " + substr
 						// + " . Root: " + subtree);
 						addChildToParent(subtree);
@@ -66,7 +66,7 @@ public class Tree_Builder {
 						// brackets
 						String substr = regex.substring(i + 1, closingBracketPosition);
 
-						TreeNode subtree = generateSubtree(substr);
+						Tree_Node subtree = generateSubtree(substr);
 						addChildToParent(subtree);
 						// System.out.println("\t Generated subtree for " +
 						// substr + " . Root: " + subtree);
@@ -75,14 +75,15 @@ public class Tree_Builder {
 					}
 
 				} else {
+					// otherwise regex: (...) - brackets are irrelevant
 					String substr = regex.substring(i + 1, closingBracketPosition);
 
-					TreeNode subtree = generateSubtree(substr);
+					Tree_Node subtree = generateSubtree(substr);
 					addChildToParent(subtree);
 					// System.out.println("\t Generated subtree for " + substr +
 					// " . Root: " + subtree);
+					i = closingBracketPosition;
 				}
-				// otherwise regex: (...) - brackets are irrelevant
 
 			} else if (c == '|') {
 
@@ -92,8 +93,8 @@ public class Tree_Builder {
 				if (closingBracketPosition != -1) {
 					// System.out.println("Union symbol found inside brackets");
 
-					TreeNode parent = getCurrentParent();
-					if (parent instanceof TreeNode.ConcatNode) {
+					Tree_Node parent = getCurrentParent();
+					if (parent instanceof Tree_Node.ConcatNode) {
 						/*-
 						 * put a new union node between the concat node and its left child
 						 * 	 • 		  •
@@ -104,8 +105,8 @@ public class Tree_Builder {
 						 *
 						 */
 
-						TreeNode leftChild = parent.getLeftChild();
-						TreeNode unionNode = new TreeNode.UnionNode();
+						Tree_Node leftChild = parent.getLeftChild();
+						Tree_Node unionNode = new Tree_Node.UnionNode();
 						parentStack.push(unionNode);
 						unionNode.addChild(leftChild);
 						leftChild.setParent(unionNode);
@@ -113,7 +114,7 @@ public class Tree_Builder {
 
 						// generate subtree between |..)
 						String substr = regex.substring(i + 1, closingBracketPosition);
-						TreeNode subtree = generateSubtree(substr);
+						Tree_Node subtree = generateSubtree(substr);
 						addChildToParent(subtree);
 
 						i = closingBracketPosition; // skip to position after
@@ -134,24 +135,33 @@ public class Tree_Builder {
 					 * 	 /			 /
 					 *  b			b
 					 */
-					// System.out.println("Union symbol found outside
-					// brackets");
+					// System.out.println("Union symbol found outside brackets.
+					// Adding union node as new root");
 
-					TreeNode unionNode = new TreeNode.UnionNode();
+					Tree_Node unionNode = new Tree_Node.UnionNode();
 					unionNode.addChild(root);
 					root.setParent(unionNode);
 					root = unionNode;
 
-					TreeNode currentParent = getCurrentParent();
-					TreeNode leftChild = currentParent.getLeftChild();
+					Tree_Node currentParent = getCurrentParent();
+					Tree_Node leftChild = currentParent.getLeftChild();
+					// System.out
+					// .println("Replacing current parent " + currentParent + "
+					// with its left child " + leftChild);
 
 					if (currentParent != root) {
-						TreeNode ancestor = currentParent.getParent();
-						ancestor.setLeftChild(leftChild);
+						Tree_Node ancestor = currentParent.getParent();
+
+						// **************
+						ancestor.replaceChild(currentParent, leftChild);
+
 						leftChild.setParent(ancestor);
+						// System.out.println("ancestor " + ancestor + " is the
+						// new parent of " + leftChild);
 					}
 					parentStack.pop();
 					parentStack.insertElementAt(unionNode, 0);
+					// System.out.println("Stack: " + parentStack);
 				}
 
 			} else if (Character.isLetterOrDigit(c)) {
@@ -181,9 +191,9 @@ public class Tree_Builder {
 		return root;
 	}
 
-	private TreeNode generateSubtree(String regex) {
+	private Tree_Node generateSubtree(String regex) {
 		Tree_Builder builder = new Tree_Builder(regex);
-		TreeNode subtree = builder.buildTree();
+		Tree_Node subtree = builder.buildTree();
 		return subtree;
 	}
 
@@ -211,33 +221,39 @@ public class Tree_Builder {
 
 	private void addConcatNode() {
 		// System.out.println("Added • node");
-		TreeNode concatNode;
+		Tree_Node concatNode;
 		if (root == null) {
-			concatNode = new TreeNode.ConcatNode(null);
+			concatNode = new Tree_Node.ConcatNode(null);
 			root = concatNode;
 		} else {
-			TreeNode parent = getCurrentParent();
-			concatNode = new TreeNode.ConcatNode(parent);
+			Tree_Node parent = getCurrentParent();
+			concatNode = new Tree_Node.ConcatNode(parent);
+
+			// *************
+			addChildToParent(concatNode);
 		}
 		parentStack.push(concatNode);
-		// System.out.println("Stack: " + parentStack);
+		// System.out.println("Added • node to stack. Stack: " + parentStack);
 	}
 
 	private void addStarNode() {
 		// System.out.println("Added * node");
-		TreeNode starNode;
+		Tree_Node starNode;
 		if (root == null) {
-			starNode = new TreeNode.StarNode(null);
+			starNode = new Tree_Node.StarNode(null);
 			root = starNode;
 		} else {
-			TreeNode parent = getCurrentParent();
-			starNode = new TreeNode.StarNode(parent);
+			Tree_Node parent = getCurrentParent();
+			starNode = new Tree_Node.StarNode(parent);
+
+			// ***********
+			addChildToParent(starNode);
 		}
 		parentStack.push(starNode);
-		// System.out.println("Stack: " + parentStack);
+		// System.out.println("Added * node to stack. Stack: " + parentStack);
 	}
 
-	private TreeNode getCurrentParent() {
+	private Tree_Node getCurrentParent() {
 		if (!parentStack.isEmpty()) {
 			return parentStack.peek();
 		}
@@ -245,31 +261,38 @@ public class Tree_Builder {
 	}
 
 	private void addLeafToParent(char c) {
-		addChildToParent(new TreeNode.LeafNode(Character.toString(c)));
+		addChildToParent(new Tree_Node.LeafNode(Character.toString(c)));
 	}
 
-	private void addChildToParent(TreeNode child) {
-		TreeNode parent = getCurrentParent();
+	private void addChildToParent(Tree_Node child) {
+		Tree_Node parent = getCurrentParent();
 
 		if (parent == null) {
 			root = child;
+			child.setParent(null);
 		} else {
 			parent.addChild(child);
 			child.setParent(parent);
+			// System.out.println("Adding " + child.getText() + " to parent " +
+			// parent + ". parent has "
+			// + parent.getChildCount() + " children");
 
-			if (parent instanceof TreeNode.StarNode && parent.getChildCount() == 1) {
-				TreeNode prevParent = parentStack.pop();
+			if (parent instanceof Tree_Node.StarNode && parent.getChildCount() == 1) {
+				Tree_Node prevParent = parentStack.pop();
+				// System.out.println("Parent node full - removing " +
+				// prevParent + ". Stack: " + parentStack);
 
-				if (!parentStack.isEmpty()) {
-					addChildToParent(prevParent);
-				}
+				// if (!parentStack.isEmpty()) {
+				// addChildToParent(prevParent);
+				// }
 
 			} else if (parent.getChildCount() == 2) {
-				TreeNode prevParent = parentStack.pop();
-
-				if (!parentStack.isEmpty()) {
-					addChildToParent(prevParent);
-				}
+				Tree_Node prevParent = parentStack.pop();
+				// System.out.println("Parent node full - removing " +
+				// prevParent + ". Stack: " + parentStack);
+				// if (!parentStack.isEmpty()) {
+				// addChildToParent(prevParent);
+				// }
 			}
 		}
 	}

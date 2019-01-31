@@ -6,10 +6,10 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
-import regex_to_FA.TreeNode.ConcatNode;
-import regex_to_FA.TreeNode.LeafNode;
-import regex_to_FA.TreeNode.StarNode;
-import regex_to_FA.TreeNode.UnionNode;
+import regex_to_FA.Tree_Node.ConcatNode;
+import regex_to_FA.Tree_Node.LeafNode;
+import regex_to_FA.Tree_Node.StarNode;
+import regex_to_FA.Tree_Node.UnionNode;
 
 public class Regex_to_FA {
 
@@ -17,24 +17,27 @@ public class Regex_to_FA {
 	private char[] chars;
 
 	// take in a regex and turn it into a FA
-	public FiniteAutomata convertToFA(String regex) {
+	public Finite_Automata convertToFA(String regex) {
+		regex = regex.replace(" ", "");
+		System.out.println("Regex - " + regex);
 		chars = regex.toCharArray();
 
 		boolean valid = validate(regex);
 		if (!valid) {
 			System.out.println("Regex not valid");
 		} else {
-			System.out.println("building tree");
-			TreeNode root = (new Tree_Builder(regex)).buildTree();
+//			System.out.println("building tree");
+			Tree_Node root = (new Tree_Builder(regex)).buildTree();
 
-			PrintTree.print(root);
-			FiniteAutomata FA = generateFA(root);
+//			Print_Tree.print(root);
+			Finite_Automata FA = generateFA(root);
 			return FA;
+			
 		}
 		return null;
 	}
 
-	private FiniteAutomata generateFA(TreeNode node) {
+	private Finite_Automata generateFA(Tree_Node node) {
 
 		// take in the root of the tree and generate the FA
 		Automaton_Builder builder = new Automaton_Builder();
@@ -45,31 +48,33 @@ public class Regex_to_FA {
 			// not a leaf node
 
 			if (node.getLeftChild() != null) {
-				System.out.println("\tGenerating FA for left child");
-				FiniteAutomata leftFA = generateFA(node.getLeftChild());
+//				System.out.println("\tGenerating FA for left child");
+				Finite_Automata leftFA = generateFA(node.getLeftChild());
+//				System.out.println("Left child: " + leftFA);
 
 				if (node instanceof StarNode) {
-					System.out.println("Adding star operator to left child");
+//					System.out.println("Adding star operator to left child");
 					return builder.addStarOperator(leftFA);
 				} else {
 
 					if (node.getRightChild() != null) {
-						System.out.println("\tGenerating FA for right child");
-						FiniteAutomata rightFA = generateFA(node.getRightChild());
+//						System.out.println("\tGenerating FA for right child");
+						Finite_Automata rightFA = generateFA(node.getRightChild());
+//						System.out.println("Right child: " + rightFA);
 						
 						if (node instanceof UnionNode) {
 							// use rule 3 to connect child NFAs
-							System.out.println("\tCombining child nodes with |");
+//							System.out.println("\tCombining child nodes with |");
 							return builder.combineWithUnion(leftFA, rightFA);
 							
 						} else if (node instanceof ConcatNode) {
 							// use rule 4 to connect child NFAs
-							System.out.println("\tCombining child nodes with •");
+//							System.out.println("\tCombining child nodes with •");
 							return builder.combineWithConcat(leftFA, rightFA);
 						}
 					} else {
 						// no right child - should never be the case
-						System.out.println("No right child found");
+//						System.out.println("No right child found");
 					}
 				}
 			}

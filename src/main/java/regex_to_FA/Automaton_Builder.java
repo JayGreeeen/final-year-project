@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import regex_to_FA.TreeNode.LeafNode;
+import regex_to_FA.Tree_Node.LeafNode;
 
 public class Automaton_Builder {
 
@@ -13,7 +13,7 @@ public class Automaton_Builder {
 
 	// create basic automaton for a leaf node - single transition
 	// initial state -- node text --> final state
-	public FiniteAutomata buildSimpleAutomaton(LeafNode node) {
+	public Finite_Automata buildSimpleAutomaton(LeafNode node) {
 		String label = node.getText();
 
 		// initial state
@@ -38,11 +38,11 @@ public class Automaton_Builder {
 		// transitions
 		initialState.addTransition(finalState, label);
 
-		return new FiniteAutomata(initialState, finalStates, states, inputAlphabet);
+		return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
 	}
 
 	// combine with union symbol - rule 3
-	public FiniteAutomata combineWithUnion(FiniteAutomata FA1, FiniteAutomata FA2) {
+	public Finite_Automata combineWithUnion(Finite_Automata FA1, Finite_Automata FA2) {
 		State initialState = createNewInitialState();
 
 		int totalStateCount = FA1.getStateCount() + FA2.getStateCount();
@@ -78,11 +78,11 @@ public class Automaton_Builder {
 		inputAlphabet.addAll(FA1.getInputAlphabet());
 		inputAlphabet.addAll(FA2.getInputAlphabet());
 
-		return new FiniteAutomata(initialState, finalStates, states, inputAlphabet);
+		return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
 	}
 
 	// combine with concat symbol = rule 4
-	public FiniteAutomata combineWithConcat(FiniteAutomata FA1, FiniteAutomata FA2) {
+	public Finite_Automata combineWithConcat(Finite_Automata FA1, Finite_Automata FA2) {
 		State initialState = createNewInitialState();
 
 		State initialStateFA1 = FA1.getInitialState();
@@ -93,20 +93,20 @@ public class Automaton_Builder {
 
 		// combine final state of FA1 and initial state of FA2
 		combineStates(finalStateFA1, initialStateFA2);
-		
-		// remove initial state of FA2 from set 
+
+		// remove initial state of FA2 from set
 		ArrayList<State> FA2States = FA2.getStates();
 		FA2States.remove(initialStateFA2);
-		
+
 		ArrayList<State> states = renameStates(FA1.getStates(), FA2States);
-		
+
 		State finalState = createNewFinalState(states.size());
 		states.add(0, initialState);
 		states.add(finalState);
-		
+
 		ArrayList<State> finalStates = new ArrayList<State>();
 		finalStates.add(finalState);
-		
+
 		initialStateFA1.setInitial(false);
 		initialState.addEmptyTransition(initialStateFA1);
 		finalStateFA1.setFinal(false);
@@ -119,20 +119,20 @@ public class Automaton_Builder {
 		inputAlphabet.addAll(FA1.getInputAlphabet());
 		inputAlphabet.addAll(FA2.getInputAlphabet());
 
-		return new FiniteAutomata(initialState, finalStates, states, inputAlphabet);
+		return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
 	}
-	
-	private State combineStates(State state1, State state2){
+
+	private State combineStates(State state1, State state2) {
 		Map<State, String> transitions = state2.getTransitions();
-		
-		for (Entry<State, String> transition : transitions.entrySet()){
+
+		for (Entry<State, String> transition : transitions.entrySet()) {
 			state1.addTransition(transition.getKey(), transition.getValue());
 		}
 		return state1;
 	}
 
 	// star operator - rule 5
-	public FiniteAutomata addStarOperator(FiniteAutomata FA) {
+	public Finite_Automata addStarOperator(Finite_Automata FA) {
 		State initialState = createNewInitialState();
 		State finalState = createNewFinalState(FA.getStateCount());
 
@@ -154,7 +154,7 @@ public class Automaton_Builder {
 		oldFinal.addEmptyTransition(finalState);
 		oldFinal.addEmptyTransition(oldInitial);
 
-		return new FiniteAutomata(initialState, finalStates, states, FA.getInputAlphabet());
+		return new Finite_Automata(initialState, finalStates, states, FA.getInputAlphabet());
 	}
 
 	private ArrayList<State> renameStates(ArrayList<State> statesSet1, ArrayList<State> statesSet2) {
@@ -164,7 +164,8 @@ public class Automaton_Builder {
 
 		int counter = 1;
 		for (State state : states) {
-			System.out.println("Renaming state " + state.getLabel() + " to state " + counter);
+			// System.out.println("Renaming state " + state.getLabel() + " to
+			// state " + counter);
 			state.renameState(Integer.toString(counter));
 			counter++;
 		}
@@ -174,7 +175,8 @@ public class Automaton_Builder {
 	private ArrayList<State> renameStates(ArrayList<State> states) {
 		int counter = 1;
 		for (State state : states) {
-			System.out.println("Renaming state " + state.getLabel() + " to state " + counter);
+			// System.out.println("Renaming state " + state.getLabel() + " to
+			// state " + counter);
 			state.renameState(Integer.toString(counter));
 			counter++;
 		}

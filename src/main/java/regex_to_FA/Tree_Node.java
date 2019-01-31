@@ -1,20 +1,22 @@
 package regex_to_FA;
 
-public interface TreeNode {
+public interface Tree_Node {
 
-	public TreeNode getParent();
+	public Tree_Node getParent();
 
 	public String getText();
 
-	public void addChild(TreeNode node);
+	public void addChild(Tree_Node node);
 
-	public void setLeftChild(TreeNode node);
+	public void setLeftChild(Tree_Node node);
+	
+	public void replaceChild(Tree_Node oldNode, Tree_Node newNode);
 
-	public TreeNode getLeftChild();
+	public Tree_Node getLeftChild();
 
-	public TreeNode getRightChild();
+	public Tree_Node getRightChild();
 
-	public void setParent(TreeNode node);
+	public void setParent(Tree_Node node);
 
 	public int getChildCount();
 
@@ -22,19 +24,19 @@ public interface TreeNode {
 
 	public String toString();
 
-	public class ConcatNode implements TreeNode {
-		private TreeNode parent;
+	public class ConcatNode implements Tree_Node {
+		private Tree_Node parent;
 		private String text;
-		private TreeNode leftChild;
-		private TreeNode rightChild;
+		private Tree_Node leftChild;
+		private Tree_Node rightChild;
 		private int childCount = 0;
 
-		public ConcatNode(TreeNode parent) {
+		public ConcatNode(Tree_Node parent) {
 			text = "•";
 			this.parent = parent;
 		}
 
-		public void addChild(TreeNode node) {
+		public void addChild(Tree_Node node) {
 			if (leftChild == null) {
 				leftChild = node;
 			} else {
@@ -45,15 +47,15 @@ public interface TreeNode {
 			childCount++;
 		}
 
-		public TreeNode getLeftChild() {
+		public Tree_Node getLeftChild() {
 			return leftChild;
 		}
 
-		public TreeNode getRightChild() {
+		public Tree_Node getRightChild() {
 			return rightChild;
 		}
 
-		public TreeNode getParent() {
+		public Tree_Node getParent() {
 			return parent;
 		}
 
@@ -61,7 +63,7 @@ public interface TreeNode {
 			return text;
 		}
 
-		public void setParent(TreeNode node) {
+		public void setParent(Tree_Node node) {
 			this.parent = node;
 		}
 
@@ -69,10 +71,16 @@ public interface TreeNode {
 			return childCount;
 		}
 
-		public void setLeftChild(TreeNode node) {
-			leftChild = node;
-		}
+		public void setLeftChild(Tree_Node node) {}
 
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){
+			if (oldNode == leftChild){
+				leftChild = newNode;
+			} else if (oldNode == rightChild){
+				rightChild = newNode;
+			}
+		}
+		
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;
@@ -86,32 +94,32 @@ public interface TreeNode {
 
 	}
 
-	public class StarNode implements TreeNode {
+	public class StarNode implements Tree_Node {
 
-		private TreeNode parent;
+		private Tree_Node parent;
 		private String text;
-		private TreeNode child;
+		private Tree_Node child;
 		private int childCount = 0;
 
-		public StarNode(TreeNode parent) {
+		public StarNode(Tree_Node parent) {
 			text = "*";
 			this.parent = parent;
 		}
 
-		public void addChild(TreeNode node) {
+		public void addChild(Tree_Node node) {
 			child = node;
 			childCount++;
 		}
 
-		public void setParent(TreeNode node) {
+		public void setParent(Tree_Node node) {
 			this.parent = node;
 		}
 
-		public TreeNode getChild() {
+		public Tree_Node getChild() {
 			return child;
 		}
 
-		public TreeNode getParent() {
+		public Tree_Node getParent() {
 			return parent;
 		}
 
@@ -119,11 +127,11 @@ public interface TreeNode {
 			return text;
 		}
 
-		public TreeNode getLeftChild() {
+		public Tree_Node getLeftChild() {
 			return child;
 		}
 
-		public TreeNode getRightChild() {
+		public Tree_Node getRightChild() {
 			// * node has no right child
 			return null;
 		}
@@ -132,10 +140,16 @@ public interface TreeNode {
 			return childCount;
 		}
 
-		public void setLeftChild(TreeNode node) {
+		public void setLeftChild(Tree_Node node) {
 			child = node;
 		}
-
+		
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){
+			if (oldNode == child){
+				child = newNode;
+			}
+		}
+		
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;
@@ -149,9 +163,9 @@ public interface TreeNode {
 
 	}
 
-	public class LeafNode implements TreeNode {
+	public class LeafNode implements Tree_Node {
 
-		private TreeNode parent;
+		private Tree_Node parent;
 		private String text;
 
 		public LeafNode(String text) {
@@ -159,7 +173,7 @@ public interface TreeNode {
 			// this.parent = parent;
 		}
 
-		public TreeNode getParent() {
+		public Tree_Node getParent() {
 			return parent;
 		}
 
@@ -167,18 +181,18 @@ public interface TreeNode {
 			return text;
 		}
 
-		public void addChild(TreeNode node) {
+		public void addChild(Tree_Node node) {
 		}
 
-		public void setParent(TreeNode node) {
+		public void setParent(Tree_Node node) {
 			this.parent = node;
 		}
 
-		public TreeNode getLeftChild() {
+		public Tree_Node getLeftChild() {
 			return null;
 		}
 
-		public TreeNode getRightChild() {
+		public Tree_Node getRightChild() {
 			return null;
 		}
 
@@ -187,9 +201,14 @@ public interface TreeNode {
 			return 0;
 		}
 
-		public void setLeftChild(TreeNode node) {
+		public void setLeftChild(Tree_Node node) {
 		}
 
+		
+		
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){}
+		
+		
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;
@@ -203,11 +222,11 @@ public interface TreeNode {
 
 	}
 
-	public class UnionNode implements TreeNode {
+	public class UnionNode implements Tree_Node {
 
-		private TreeNode parent;
-		private TreeNode leftChild;
-		private TreeNode rightChild;
+		private Tree_Node parent;
+		private Tree_Node leftChild;
+		private Tree_Node rightChild;
 		private int childCount;
 		private String text;
 
@@ -215,7 +234,7 @@ public interface TreeNode {
 			text = "|";
 		}
 
-		public TreeNode getParent() {
+		public Tree_Node getParent() {
 			return parent;
 		}
 
@@ -223,7 +242,7 @@ public interface TreeNode {
 			return text;
 		}
 
-		public void addChild(TreeNode node) {
+		public void addChild(Tree_Node node) {
 			if (leftChild == null) {
 				leftChild = node;
 			} else {
@@ -232,15 +251,15 @@ public interface TreeNode {
 			childCount++;
 		}
 
-		public TreeNode getLeftChild() {
+		public Tree_Node getLeftChild() {
 			return leftChild;
 		}
 
-		public TreeNode getRightChild() {
+		public Tree_Node getRightChild() {
 			return rightChild;
 		}
 
-		public void setParent(TreeNode node) {
+		public void setParent(Tree_Node node) {
 			// System.out.println("Setting left child of | to " + node);
 			parent = node;
 		}
@@ -249,8 +268,16 @@ public interface TreeNode {
 			return childCount;
 		}
 
-		public void setLeftChild(TreeNode node) {
+		public void setLeftChild(Tree_Node node) {
 			leftChild = node;
+		}
+		
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){
+			if (oldNode == leftChild){
+				leftChild = newNode;
+			} else if (oldNode == rightChild){
+				rightChild = newNode;
+			}
 		}
 
 		public boolean parentSet() {

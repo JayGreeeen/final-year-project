@@ -1,13 +1,13 @@
 package regex_to_FA;
 
-public class PrintTree {
+public class Print_Tree {
 
-	public static void print(TreeNode node){
+	public static void print(Tree_Node node){
 		recursivePrint(node, -1);	
 		System.out.println("");
 	}
 	
-	private static void recursivePrint(TreeNode node, int counter){
+	private static void recursivePrint(Tree_Node node, int counter){
 		if (node != null){
 			counter++;
 			if (node.getRightChild() != null){

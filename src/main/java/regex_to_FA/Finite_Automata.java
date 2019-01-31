@@ -2,7 +2,7 @@ package regex_to_FA;
 
 import java.util.ArrayList;
 
-public class FiniteAutomata {
+public class Finite_Automata {
 
 	private State initialState;
 	private ArrayList<State> finalStates;
@@ -11,7 +11,7 @@ public class FiniteAutomata {
 	// private TransitionTable transitions;
 
 
-	public FiniteAutomata(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
+	public Finite_Automata(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
 			ArrayList<String> inputAlphabet) {
 		this.initialState = initialState;
 		this.finalStates = finalStates;
@@ -50,7 +50,7 @@ public class FiniteAutomata {
 			values += i + "\t";
 			headers += i + "\t";
 			for (int j = 0; j < states.size(); j++) {
-				values += states.get(i).hasTransitionTo(states.get(j)) + "\t";
+				values += states.get(i).getTransitionTo(states.get(j)) + "\t";
 			}
 			values += "\n";
 		}
