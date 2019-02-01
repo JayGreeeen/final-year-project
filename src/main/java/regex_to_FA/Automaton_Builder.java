@@ -1,10 +1,12 @@
-package regex_to_FA;
+package regex_to_fa;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import regex_to_FA.Tree_Node.LeafNode;
+import toolbox.Finite_Automata;
+import toolbox.State;
+import toolbox.Tree_Node.LeafNode;
 
 public class Automaton_Builder {
 
@@ -123,10 +125,11 @@ public class Automaton_Builder {
 	}
 
 	private State combineStates(State state1, State state2) {
-		Map<State, String> transitions = state2.getTransitions();
+		Map<State, ArrayList<String>> transitions = state2.getTransitions();
 
-		for (Entry<State, String> transition : transitions.entrySet()) {
-			state1.addTransition(transition.getKey(), transition.getValue());
+		for (Entry<State, ArrayList<String>> transition : transitions.entrySet()) {
+			String label = transition.getValue().get(0);	// should only be 1 transition
+			state1.addTransition(transition.getKey(), label);
 		}
 		return state1;
 	}

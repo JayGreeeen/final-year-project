@@ -1,17 +1,18 @@
-package FYP.backend;
+package regex_to_fa;
 
 import org.junit.Test;
+
+import regex_to_fa.Tree_Builder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import regex_to_FA.Print_Tree;
-import regex_to_FA.Tree_Builder;
-import regex_to_FA.Tree_Node;
-import regex_to_FA.Tree_Node.ConcatNode;
-import regex_to_FA.Tree_Node.LeafNode;
-import regex_to_FA.Tree_Node.StarNode;
-import regex_to_FA.Tree_Node.UnionNode;
+import toolbox.Print_Tree;
+import toolbox.Tree_Node;
+import toolbox.Tree_Node.ConcatNode;
+import toolbox.Tree_Node.LeafNode;
+import toolbox.Tree_Node.StarNode;
+import toolbox.Tree_Node.UnionNode;
 
 public class Tree_Builder_Test {
 	private Tree_Builder builder;

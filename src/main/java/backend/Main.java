@@ -1,15 +1,19 @@
 package backend;
 
-import regex_to_FA.Automaton_Builder;
-import regex_to_FA.Finite_Automata;
-import regex_to_FA.Regex_to_FA;
-import regex_to_FA.Tree_Node;
-import regex_to_FA.Tree_Node.LeafNode;
+import java.util.ArrayList;
+
+import fa_to_regex.FA_to_Regex;
+import regex_to_fa.Automaton_Builder;
+import regex_to_fa.Regex_to_FA;
+import toolbox.Finite_Automata;
+import toolbox.State;
+import toolbox.Tree_Node;
+import toolbox.Tree_Node.LeafNode;
 
 public class Main {
     public static void main( String[] args ){
     	
-    	String regex = "abc* | (ab)* a*";
+//    	String regex = "abc* | (ab)* a*";
     	
     	// aab
     	// a | b
@@ -22,8 +26,8 @@ public class Main {
     	// (ab)*a*
     	// (a|b)*
     	
-    	Regex_to_FA converter = new Regex_to_FA();
-    	converter.convertToFA(regex);
+//    	Regex_to_FA converter = new Regex_to_FA();
+//    	converter.convertToFA(regex);
     	
 //    	Tree_Node node1 = new Tree_Node.LeafNode("a");
 //    	Tree_Node node2 = new Tree_Node.LeafNode("b");
@@ -42,5 +46,37 @@ public class Main {
 
 //    	FiniteAutomata FA5 = builder.addStarOperator(FA);
 //    	System.out.println(FA5);
+    	
+    	// *********************
+    	
+    	// (0) -a-> (1) -b-> (2)
+    	State initial = new State("0");
+    	initial.setInitial(true);
+    	State simple = new State("1");
+    	State finalState = new State("2");
+    	finalState.setFinal(true);
+    	
+    	initial.addTransition(simple, "a");
+    	simple.addTransition(finalState, "b");
+    	
+    	ArrayList<State> finalStates = new ArrayList<State>();
+    	finalStates.add(finalState);
+    	
+    	ArrayList<State> states = new ArrayList<State>();
+    	states.add(initial);
+    	states.add(simple);
+    	states.add(finalState);
+    	
+    	ArrayList<String> inputAlphabet = new ArrayList<String>();
+    	inputAlphabet.add("a");
+    	inputAlphabet.add("b");
+    	
+    	Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
+    	
+    	FA_to_Regex converter = new FA_to_Regex();
+    	String regex = converter.convert(fa);
+    	
+    	System.out.println("regex: " + regex);
+    	
     }
 }

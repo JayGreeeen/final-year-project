@@ -1,4 +1,4 @@
-package regex_to_FA;
+package regex_to_fa;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,10 +6,12 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
-import regex_to_FA.Tree_Node.ConcatNode;
-import regex_to_FA.Tree_Node.LeafNode;
-import regex_to_FA.Tree_Node.StarNode;
-import regex_to_FA.Tree_Node.UnionNode;
+import toolbox.Finite_Automata;
+import toolbox.Tree_Node;
+import toolbox.Tree_Node.ConcatNode;
+import toolbox.Tree_Node.LeafNode;
+import toolbox.Tree_Node.StarNode;
+import toolbox.Tree_Node.UnionNode;
 
 public class Regex_to_FA {
 

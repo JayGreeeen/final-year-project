@@ -1,4 +1,4 @@
-package regex_to_FA;
+package toolbox;
 
 import java.util.ArrayList;
 
@@ -18,6 +18,10 @@ public class Finite_Automata {
 		this.states = states;
 		this.inputAlphabet = inputAlphabet;
 		// this.transitions = transitions;
+	}
+	
+	public void removeState(State state){
+		states.remove(state);
 	}
 
 	public ArrayList<String> getInputAlphabet() {
@@ -50,7 +54,7 @@ public class Finite_Automata {
 			values += i + "\t";
 			headers += i + "\t";
 			for (int j = 0; j < states.size(); j++) {
-				values += states.get(i).getTransitionTo(states.get(j)) + "\t";
+				values += states.get(i).getTransitionsTo(states.get(j)) + "\t";
 			}
 			values += "\n";
 		}

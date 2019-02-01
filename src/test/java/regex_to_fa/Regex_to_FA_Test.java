@@ -1,15 +1,16 @@
-package FYP.backend;
+package regex_to_fa;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
 
+import regex_to_fa.Regex_to_FA;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import regex_to_FA.Finite_Automata;
-import regex_to_FA.Regex_to_FA;
-import regex_to_FA.State;
+import toolbox.Finite_Automata;
+import toolbox.State;
 
 public class Regex_to_FA_Test {
 	private ArrayList<String> inputAlphabet = new ArrayList<String>();
@@ -37,7 +38,7 @@ public class Regex_to_FA_Test {
 		assertEquals(finalStateLabel, actualFinal.getLabel());
 		assertEquals(numStates, actualFA.getStateCount());
 		assertEquals(inputAlphabet, actualFA.getInputAlphabet());
-		assertTrue(actualInitial.getTransitionTo(actualFinal).equals("a"));
+		assertTrue(actualInitial.getTransitionsTo(actualFinal).get(0).equals("a"));
 	}
 
 	@Test
@@ -73,10 +74,10 @@ public class Regex_to_FA_Test {
 		assertEquals(numStates, actualFA.getStateCount());
 		assertEquals(inputAlphabet, actualFA.getInputAlphabet());
 
-		assertTrue(actualInitial.getTransitionTo(actualState1).equals("ε"));
-		assertTrue(actualState1.getTransitionTo(actualState2).equals("a"));
-		assertTrue(actualState2.getTransitionTo(actualState3).equals("b"));
-		assertTrue(actualState3.getTransitionTo(actualFinal).equals("ε"));
+		assertTrue(actualInitial.getTransitionsTo(actualState1).get(0).equals("ε"));
+		assertTrue(actualState1.getTransitionsTo(actualState2).get(0).equals("a"));
+		assertTrue(actualState2.getTransitionsTo(actualState3).get(0).equals("b"));
+		assertTrue(actualState3.getTransitionsTo(actualFinal).get(0).equals("ε"));
 	}
 
 	@Test
@@ -119,12 +120,12 @@ public class Regex_to_FA_Test {
 		assertEquals(numStates, actualFA.getStateCount());
 		assertEquals(inputAlphabet, actualFA.getInputAlphabet());
 
-		assertTrue(actualInitial.getTransitionTo(actualState1).equals("ε"));
-		assertTrue(actualInitial.getTransitionTo(actualState3).equals("ε"));
-		assertTrue(actualState1.getTransitionTo(actualState2).equals("a"));
-		assertTrue(actualState2.getTransitionTo(actualFinal).equals("ε"));
-		assertTrue(actualState3.getTransitionTo(actualState4).equals("b"));
-		assertTrue(actualState4.getTransitionTo(actualFinal).equals("ε"));
+		assertTrue(actualInitial.getTransitionsTo(actualState1).get(0).equals("ε"));
+		assertTrue(actualInitial.getTransitionsTo(actualState3).get(0).equals("ε"));
+		assertTrue(actualState1.getTransitionsTo(actualState2).get(0).equals("a"));
+		assertTrue(actualState2.getTransitionsTo(actualFinal).get(0).equals("ε"));
+		assertTrue(actualState3.getTransitionsTo(actualState4).get(0).equals("b"));
+		assertTrue(actualState4.getTransitionsTo(actualFinal).get(0).equals("ε"));
 	}
 
 	@Test
@@ -161,11 +162,11 @@ public class Regex_to_FA_Test {
 		assertEquals(numStates, actualFA.getStateCount());
 		assertEquals(inputAlphabet, actualFA.getInputAlphabet());
 
-		assertTrue(actualInitial.getTransitionTo(actualState1).equals("ε"));
-		assertTrue(actualInitial.getTransitionTo(actualFinal).equals("ε"));
-		assertTrue(actualState1.getTransitionTo(actualState2).equals("a"));
-		assertTrue(actualState2.getTransitionTo(actualFinal).equals("ε"));
-		assertTrue(actualState2.getTransitionTo(actualState1).equals("ε"));
+		assertTrue(actualInitial.getTransitionsTo(actualState1).get(0).equals("ε"));
+		assertTrue(actualInitial.getTransitionsTo(actualFinal).get(0).equals("ε"));
+		assertTrue(actualState1.getTransitionsTo(actualState2).get(0).equals("a"));
+		assertTrue(actualState2.getTransitionsTo(actualFinal).get(0).equals("ε"));
+		assertTrue(actualState2.getTransitionsTo(actualState1).get(0).equals("ε"));
 	}
 
 }

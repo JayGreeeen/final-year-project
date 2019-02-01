@@ -1,8 +1,11 @@
-package regex_to_FA;
+package regex_to_fa;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import toolbox.Tree_Node;
+
 import java.util.Stack;
 
 public class Tree_Builder {

@@ -1,11 +1,11 @@
-package FYP.backend;
+package regex_to_fa;
 
 import org.junit.Test;
 
-import regex_to_FA.Automaton_Builder;
-import regex_to_FA.Finite_Automata;
-import regex_to_FA.State;
-import regex_to_FA.Tree_Node;
+import regex_to_fa.Automaton_Builder;
+import toolbox.Finite_Automata;
+import toolbox.State;
+import toolbox.Tree_Node;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,7 +45,7 @@ public class Automaton_Builder_Test {
 		State finalState = actual.getFinalStates().get(0);
 
 		assertEquals(finalLabel, finalState.getLabel());
-		assertTrue(initial.getTransitionTo(finalState) == "a");
+		assertTrue(initial.getTransitionsTo(finalState).get(0) == "a");
 	}
 
 	@Test
@@ -90,10 +90,10 @@ public class Automaton_Builder_Test {
 		State finalState = actual.getFinalStates().get(0);
 
 		assertEquals(finalLabel, finalState.getLabel());
-		assertTrue(initial.getTransitionTo(state1) == "ε");
-		assertTrue(state1.getTransitionTo(state2) == "a");
-		assertTrue(state2.getTransitionTo(state3) == "b");
-		assertTrue(state3.getTransitionTo(finalState) == "ε");
+		assertTrue(initial.getTransitionsTo(state1).get(0) == "ε");
+		assertTrue(state1.getTransitionsTo(state2).get(0) == "a");
+		assertTrue(state2.getTransitionsTo(state3).get(0) == "b");
+		assertTrue(state3.getTransitionsTo(finalState).get(0) == "ε");
 	}
 
 	@Test
@@ -143,12 +143,12 @@ public class Automaton_Builder_Test {
 		State finalState = actual.getFinalStates().get(0);
 
 		assertEquals(finalLabel, finalState.getLabel());
-		assertTrue(initial.getTransitionTo(state1) == "ε");
-		assertTrue(initial.getTransitionTo(state3) == "ε");
-		assertTrue(state1.getTransitionTo(state2) == "a");
-		assertTrue(state2.getTransitionTo(finalState) == "ε");
-		assertTrue(state3.getTransitionTo(state4) == "b");
-		assertTrue(state4.getTransitionTo(finalState) == "ε");
+		assertTrue(initial.getTransitionsTo(state1).get(0) == "ε");
+		assertTrue(initial.getTransitionsTo(state3).get(0) == "ε");
+		assertTrue(state1.getTransitionsTo(state2).get(0) == "a");
+		assertTrue(state2.getTransitionsTo(finalState).get(0) == "ε");
+		assertTrue(state3.getTransitionsTo(state4).get(0) == "b");
+		assertTrue(state4.getTransitionsTo(finalState).get(0) == "ε");
 	}
 	
 	@Test
@@ -189,11 +189,11 @@ public class Automaton_Builder_Test {
 		State finalState = actual.getFinalStates().get(0);
 		
 		assertEquals(finalLabel, finalState.getLabel());
-		assertTrue(initial.getTransitionTo(state1) == "ε");
-		assertTrue(initial.getTransitionTo(finalState) == "ε");
-		assertTrue(state1.getTransitionTo(state2) == "a");
-		assertTrue(state2.getTransitionTo(state1) == "ε");
-		assertTrue(state2.getTransitionTo(finalState) == "ε");
+		assertTrue(initial.getTransitionsTo(state1).get(0) == "ε");
+		assertTrue(initial.getTransitionsTo(finalState).get(0) == "ε");
+		assertTrue(state1.getTransitionsTo(state2).get(0) == "a");
+		assertTrue(state2.getTransitionsTo(state1).get(0) == "ε");
+		assertTrue(state2.getTransitionsTo(finalState).get(0) == "ε");
 	}
 	
 	
@@ -265,16 +265,16 @@ public class Automaton_Builder_Test {
 		State finalState = star.getFinalStates().get(0);
 		
 		assertEquals(finalLabel, finalState.getLabel());
-		assertTrue(initial.getTransitionTo(state1) == "ε");
-		assertTrue(initial.getTransitionTo(finalState) == "ε");
-		assertTrue(state1.getTransitionTo(state2) == "ε");
-		assertTrue(state1.getTransitionTo(state4) == "ε");
-		assertTrue(state2.getTransitionTo(state3) == "a");
-		assertTrue(state3.getTransitionTo(state6) == "ε");
-		assertTrue(state4.getTransitionTo(state5) == "b");
-		assertTrue(state5.getTransitionTo(state6) == "ε");
-		assertTrue(state6.getTransitionTo(state1) == "ε");
-		assertTrue(state6.getTransitionTo(finalState) == "ε");
+		assertTrue(initial.getTransitionsTo(state1).get(0) == "ε");
+		assertTrue(initial.getTransitionsTo(finalState).get(0) == "ε");
+		assertTrue(state1.getTransitionsTo(state2).get(0) == "ε");
+		assertTrue(state1.getTransitionsTo(state4).get(0) == "ε");
+		assertTrue(state2.getTransitionsTo(state3).get(0) == "a");
+		assertTrue(state3.getTransitionsTo(state6).get(0) == "ε");
+		assertTrue(state4.getTransitionsTo(state5).get(0) == "b");
+		assertTrue(state5.getTransitionsTo(state6).get(0) == "ε");
+		assertTrue(state6.getTransitionsTo(state1).get(0) == "ε");
+		assertTrue(state6.getTransitionsTo(finalState).get(0) == "ε");
 	}
 
 }
