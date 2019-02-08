@@ -11,9 +11,6 @@ public class State {
 	private boolean isInitialState = false;
 	private boolean isFinalState = false;
 	
-	private int xposition;
-	private int yposition;
-
 	public State(String label) {
 		this.label = label;
 		transitions = new HashMap<State, ArrayList<String>>();
@@ -60,25 +57,6 @@ public class State {
 		return label;
 	}
 	
-	// *******
-	public void setXPos(int xpos){
-		xposition = xpos;
-	}
-	
-	public void setYPos(int ypos){
-		yposition = ypos;
-	}
-	
-	public int getXPos(){
-		return xposition;
-	}
-
-	public int getYPos(){
-		return yposition;
-	}
-	// ******
-	
-
 	public void setInitial(boolean initial) {
 		isInitialState = initial;
 	}

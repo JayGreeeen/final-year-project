@@ -7,12 +7,12 @@ import java.awt.Graphics;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public class RegexPanel extends JPanel {
+public class RegexPanel2 extends JPanel {
 
 	private String regex = "";
 	private Graphics g;
 
-	public RegexPanel(){
+	public RegexPanel2(){
 		setBackground(Color.white);
 		setMinimumSize(new Dimension(100, 300));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));

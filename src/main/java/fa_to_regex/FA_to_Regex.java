@@ -46,7 +46,7 @@ public class FA_to_Regex {
 //		if (regex.startsWith("(") && regex.endsWith(")")){
 //			regex = regex.substring(1, regex.length() - 1);
 //		}
-		
+		System.out.println("Regex: " + regex);
 		return regex;
 	}
 

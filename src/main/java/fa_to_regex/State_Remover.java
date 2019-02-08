@@ -81,6 +81,9 @@ public class State_Remover {
 		}
 
 		// clean up initial
+		System.out.println("initial: " + initial.getTransitions());
+		System.out.println("finalState: " + finalState.getTransitions());
+		
 		String initialToFinal = cleanUpMultiArrows(initial, finalState);
 		String finalToInitial = cleanUpMultiArrows(finalState, initial);
 		String initialToInitial = cleanUpSelfPointingArrows(initial);
@@ -89,20 +92,22 @@ public class State_Remover {
 		String regex = initialToFinal;
 		String f2i = finalToInitial;
 
-		if (initialToInitial != "-" && initialToInitial != "") {
+		if (!initialToInitial.equals("-") && !initialToInitial.equals("")) {
 			System.out.println("Adding " + initialToInitial + " to start of " + regex);
 
 			regex = initialToInitial + initialToFinal;
 			f2i += initialToInitial;
 		}
 
-		if (finalToFinal != "-" && finalToFinal != "") {
+//		if (finalToFinal != "-" && finalToFinal != "") {
+		if (!finalToFinal.equals("-") && !finalToFinal.equals("")) {
 			System.out.println("Adding " + finalToFinal + " to end of " + regex);
 			regex += finalToFinal;
 			f2i = finalToFinal + f2i;
 		}
 
-		if (finalToInitial != "-" && finalToInitial != "") {
+//		if (finalToInitial != "-" && finalToInitial != "") {
+		if (!finalToInitial.equals("-") && !finalToInitial.equals("")) {
 			System.out.println("adding " + f2i + " as choice: " + "(" + f2i + regex + ")*");
 			regex = regex + "|" + "(" + regex + f2i + regex + ")*";
 		}
@@ -118,7 +123,7 @@ public class State_Remover {
 		ArrayList<String> transitions = state.getTransitionsTo(state);
 		String label = "";
 
-		if (transitions.size() > 0 && transitions.get(0) != "-") {
+		if (transitions.size() > 0 && !transitions.get(0).equals("-")) {
 			if (transitions.size() > 1) {
 				label = createUnionLabel(transitions);
 			} else {
@@ -136,8 +141,10 @@ public class State_Remover {
 	private String cleanUpMultiArrows(State from, State to) {
 		ArrayList<String> transitions = from.getTransitionsTo(to);
 		String label = "";
+		
+//		System.out.println("found mutliple transitions: " + from + " to " + to + ": " + from.getTransitionsTo(to));
 
-		if (transitions.size() > 0) {
+		if (transitions.size() > 0 && transitions.get(0) != "-") {
 			if (transitions.size() > 1) {
 				label = createUnionLabel(transitions);
 			} else {
