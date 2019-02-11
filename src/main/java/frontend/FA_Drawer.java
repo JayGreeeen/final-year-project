@@ -17,7 +17,8 @@ public class FA_Drawer {
 	private final int circle_radius = 20;
 
 	public void drawFA(Graphics g, Finite_Automata fa) {
-		Map<State, State_Centre> statePositions = drawStates(g, fa.getStates());
+		ArrayList<State> stateList = fa.getStates();
+		Map<State, State_Centre> statePositions = drawStates(g, stateList);
 
 		for (State start : statePositions.keySet()) {
 
@@ -32,28 +33,42 @@ public class FA_Drawer {
 
 				ArrayList<String> labels = entry.getValue();
 
-				int stateLabel = Integer.parseInt(start.getLabel());
-				int state2Label = Integer.parseInt(end.getLabel());
+				int startIndex = stateList.indexOf(start);
+				int endIndex = stateList.indexOf(end);
 
 				boolean nextTo = false;
+				boolean backwardsTransition = false;
 
-				if (stateLabel == state2Label - 1) {
-					// states are next to eachother
+				if (startIndex > endIndex){
+					backwardsTransition = true;
+				}
+				if (startIndex == endIndex - 1){
 					nextTo = true;
 				}
-
-				drawTransitions(g, startPos, endPos, labels, nextTo);
+				
+				drawTransitions(g, startPos, endPos, labels, nextTo, backwardsTransition);
 			}
 		}
 	}
 
 	private void drawTransitions(Graphics g, State_Centre start, State_Centre end, ArrayList<String> labels,
-			boolean nextTo) {
+			boolean nextTo, boolean backwardsTransition) {
 		int numLabels = labels.size();
 		int height = 50;
 		int curve = -1;
 
 		if (nextTo) {
+
+			if (backwardsTransition) {
+
+				// want it to curve down and under
+
+				// need to consider that there may be transitions in the
+				// forwards direction
+				// dont want the arrows to overlap
+
+			}
+
 			if (numLabels == 1) {
 
 				drawStraightTransition(g, start, end, labels.get(0));
@@ -84,6 +99,41 @@ public class FA_Drawer {
 			}
 
 		} else {
+			height = 50;
+			
+			// find out how far apart they are
+			// use this as a factor for the distance
+			// e.g. height = 50 + distance x20
+			// 1 apart = next to 
+			// so if theyre 2 apart - 50 + (2 x 20) = 70
+			// if theyre 3 apart - 50 + (3 x 20) = 80
+			// might need a smaller value than 20
+			
+			int startX = start.getXPos();
+			int endX = end.getXPos();
+			
+			
+			int dist = endX - startX;
+//			System.out.println("distance between states: " + dist);
+//			height += ((dist / 100) * 15);
+			height += ((dist / 100) * 20);
+//			System.out.println("Height: " + height);
+			
+			if (backwardsTransition) {
+				
+				// want it to curve down and under
+				
+				// need to consider that there may be transitions in the
+				// forwards direction
+				// dont want the arrows to overlap
+				
+				dist = startX - endX;
+				height += (dist/ 100)*15;
+				
+				height = -height;
+			}
+			
+
 			// states are not next to each other alternate above and below
 			// increase height after every 2 arrows
 			for (int i = 0; i < numLabels; i++) {
@@ -112,13 +162,20 @@ public class FA_Drawer {
 	}
 
 	private void drawState(Graphics g, int xCentre, int yCentre, State state) {
+		// TODO
+		// check the length of the string - depending on the length, changes the
+		// width of the circle
+		// the wider it gets, we would want it to be slightly higher as well
+		// ***************************
+
 		g.drawOval(xCentre - circle_radius, yCentre - circle_radius, 2 * circle_radius, 2 * circle_radius);
 		g.drawString(state.getLabel(), xCentre - 3, yCentre + 3);
 
 		if (state.isFinalState()) {
 			int radius = circle_radius - 2;
 			g.drawOval(xCentre - radius, yCentre - radius, 2 * radius, 2 * radius);
-		} else if (state.isInitialState()) {
+		}
+		if (state.isInitialState()) {
 			drawInitialArrow(g, xCentre, yCentre, state.getLabel());
 		}
 	}
@@ -193,6 +250,12 @@ public class FA_Drawer {
 		double starty = start.getYPos();
 		double endx = end.getXPos();
 		double endy = end.getYPos();
+
+		if (start == end) {
+			startx -= 10;
+			endx += 10;
+			curve = -50;
+		}
 
 		if (curve > 0) {
 			// means the curve is going down the page

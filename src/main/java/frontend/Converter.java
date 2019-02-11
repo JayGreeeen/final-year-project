@@ -2,26 +2,37 @@ package frontend;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,11 +44,10 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import fa_to_regex.FA_to_Regex;
 import regex_to_fa.Regex_to_FA;
 import toolbox.Finite_Automata;
+import toolbox.ReadWriteUtility;
 import toolbox.State;
 
 public class Converter {
@@ -50,13 +60,14 @@ public class Converter {
 	final static int frameHeight = 800;
 
 	private static JFrame frame;
-
 	private JPanel regexCard;
 	private JPanel faCard;
 
+	private static ReadWriteUtility rwu;
+
 	// regex to FA
 	private JButton btnRegexConvert;
-	private JTextField txtField;
+	private JTextField txtRegex;
 	private RegexConverterPanel faDiagramRegexPanel;
 
 	// FA to Regex
@@ -67,6 +78,7 @@ public class Converter {
 	private JTable transitionTable;
 	private JComboBox<String> initialStateCombo;
 	private JList<String> finalStateList;
+	private Finite_Automata faToConvert = null;
 
 	public static void main(String[] args) {
 		createAndShowGUI();
@@ -76,6 +88,8 @@ public class Converter {
 		// Create and set up the window.
 		frame = new JFrame("Converter");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		rwu = new ReadWriteUtility(frame);
 
 		// Create and set up the content pane.
 		Converter converter = new Converter();
@@ -94,9 +108,6 @@ public class Converter {
 
 		// Create the "cards".
 		regexCard = new JPanel() {
-			// Make the panel wider than it really needs, so
-			// the window's wide enough for the tabs to stay
-			// in one row.
 			public Dimension getPreferredSize() {
 				Dimension size = super.getPreferredSize();
 				size.width += extraWindowWidth;
@@ -109,10 +120,32 @@ public class Converter {
 		setUpRegexPanel();
 		setUpFAPanel();
 
+		regexCard.setName("RegexToFA");
 		tabbedPane.addTab(REGEX_PANEL, regexCard);
+
+		faCard.setName("FAToRegex");
 		tabbedPane.addTab(FA_PANEL, faCard);
 
 		pane.add(tabbedPane, BorderLayout.CENTER);
+
+		JMenuBar menu = new JMenuBar();
+		JMenu file = new JMenu("File");
+
+		ImageIcon saveIcon = new ImageIcon(new ImageIcon("src/resources/images/save1.png").getImage()
+				.getScaledInstance(15, 15, Image.SCALE_DEFAULT));
+		ImageIcon openIcon = new ImageIcon(new ImageIcon("src/resources/images/open1.png").getImage()
+				.getScaledInstance(15, 15, Image.SCALE_DEFAULT));
+
+		JMenuItem open = new JMenuItem("Open", openIcon);
+		open.addActionListener(new OpenListener(tabbedPane));
+		JMenuItem save = new JMenuItem("Save", saveIcon);
+		save.addActionListener(new SaveListener(tabbedPane));
+
+		file.add(open);
+		file.add(save);
+		menu.add(file);
+
+		pane.add(menu, BorderLayout.NORTH);
 	}
 
 	private void setUpRegexPanel() {
@@ -121,13 +154,13 @@ public class Converter {
 		JPanel panel = new JPanel(new FlowLayout());
 
 		JLabel lblRegex = new JLabel("Enter regex:");
-		txtField = new JTextField();
-		txtField.setPreferredSize(new Dimension(600, 20));
+		txtRegex = new JTextField();
+		txtRegex.setPreferredSize(new Dimension(600, 20));
 		btnRegexConvert = new JButton("Convert");
 		btnRegexConvert.addActionListener(new ConvertAction());
 
 		panel.add(lblRegex);
-		panel.add(txtField);
+		panel.add(txtRegex);
 		panel.add(btnRegexConvert);
 
 		regexCard.add(panel, BorderLayout.NORTH);
@@ -136,6 +169,248 @@ public class Converter {
 
 		faDiagramRegexPanel.repaint();
 		regexCard.add(faDiagramRegexPanel, BorderLayout.CENTER);
+	}
+
+	class OpenListener implements ActionListener {
+
+		private JTabbedPane pane;
+
+		public OpenListener(JTabbedPane pane) {
+			this.pane = pane;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			int index = pane.getSelectedIndex();
+			Component tab = pane.getComponent(index);
+
+			String name = tab.getName();
+
+			String targetFolder = "/target";
+			String workingDir = System.getProperty("user.dir");
+
+			if (name == "RegexToFA") {
+				File dir = new File(workingDir + targetFolder, "Saved Regex's");
+
+				JFileChooser jfc = new JFileChooser(dir);
+				int returnValue = jfc.showOpenDialog(null);
+
+				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = jfc.getSelectedFile();
+					String regex = rwu.ReadRegexFromFile(selectedFile.getName());
+
+					txtRegex.setText(regex);
+				}
+			} else {
+				// FAToRegex
+				File dir = new File(workingDir + targetFolder, "Saved FAs");
+
+				JFileChooser jfc = new JFileChooser(dir);
+				int returnValue = jfc.showOpenDialog(null);
+
+				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = jfc.getSelectedFile();
+					System.out.println(selectedFile.getName());
+					
+					String fa = rwu.ReadFAFromFile(selectedFile.getName());
+					
+					convert(fa);
+				}
+			}
+		}
+		
+		private void convert(String stringFA){
+			
+			String initialLbl = "\\{\"initialState\":\\{\"label\":";
+			int initialStartPos = stringFA.indexOf(initialLbl);
+			int posAfterInitial = initialStartPos + initialLbl.length();
+			
+			String initialState = stringFA.substring(posAfterInitial, stringFA.indexOf(",") - 1);
+			
+			String alphabetLbl = "inputAlphabet";
+			
+			String stateLbl = "states";
+			int statesStartPos = stringFA.indexOf(stateLbl);
+			int posAfterStates = statesStartPos + stateLbl.length(); // "states":[.....]
+			
+			int startIndex = stringFA.indexOf(alphabetLbl) + alphabetLbl.length() + 2;
+			String inputAlphabetStr = stringFA.substring(startIndex, statesStartPos-2);
+
+			String stateList = stringFA.substring(posAfterStates + 3, stringFA.length() - 2);
+
+			String[] stateArray = stateList.split("\\{\"label\":");
+
+			ArrayList<String> states = new ArrayList<>();
+			Map<String, Map<String, String>> stateTransitions = new HashMap<>();
+			
+			for (String state : stateArray) {
+
+				String transitionsLbl = "\"transitions\":";
+
+				if (state.contains(transitionsLbl)) {
+					int transitionsPos = state.indexOf(transitionsLbl);
+					int posAfterTransitions = transitionsPos + transitionsLbl.length();
+
+					String initialStatelbl = "\"isInitialState\":";
+					int initialPos = state.indexOf(initialStatelbl);
+
+					String label = state.substring(0, transitionsPos);
+					String transitions = state.substring(posAfterTransitions, initialPos - 1);
+					
+					label = label.replaceAll(",", "");
+					label = label.replaceAll("\"", "");
+					
+					transitions = transitions.replaceAll("\\{", "");
+					transitions = transitions.replaceAll("\\}", "");
+					
+					String[] transitionArray = transitions.split(",");
+
+					Map<String, String> transitionMap = new HashMap<>();
+					
+					for (String t : transitionArray){
+						String[] b = t.split(":");
+						
+						String to = b[0];
+						String lbl = b[1];
+						
+						to = to.replaceAll("\"", "");
+						lbl = lbl.replaceAll("\\[\"", "");
+						lbl = lbl.replaceAll("\"\\]", "");
+						
+						// state : label -> to : lbl
+						transitionMap.put(to, lbl);
+						System.out.println("adding transition to " + to + " with label " + lbl);
+						
+					}
+					stateTransitions.put(label, transitionMap);
+					states.add(label);
+					
+				}
+			}
+			
+			DefaultTableModel tableModel = (DefaultTableModel) transitionTable.getModel();
+			tableModel.setRowCount(0);
+			tableModel.setColumnCount(0);
+			
+			Vector<String> columns = new Vector<String>();
+			Vector<String> row = new Vector<String>();
+			
+			tableModel.setColumnCount(states.size() + 1);
+			
+			columns.add(" ");
+			
+			for (String state : states){
+				
+				row.add(state);
+				columns.add(state);
+				
+				// for each of the other states
+				// if this state has a transition to it, add the label to the row
+				// otherwise add ""
+				
+				Map<String, String> transitionMap = stateTransitions.get(state);
+				
+				for (String to : states){
+					System.out.println("checking to see if transition map for " + state + " contains transition to " + to);
+					
+					if (transitionMap.containsKey(to)){
+						String label = transitionMap.get(to);
+						System.out.println("\tyes: " + label);
+						row.add(label);
+					} else {
+						System.out.println("\tno");
+						row.add(" ");
+					}
+					
+				}
+				System.out.println("adding row vector: " + row);
+//				rows.add(row);
+				tableModel.addRow(row);
+				row = new Vector<String>();
+			}
+			tableModel.setColumnIdentifiers(columns);
+			transitionTable.setModel(tableModel);
+			
+//			transitionPanel.revalidate();
+//			transitionPanel.repaint();
+			
+			
+			
+			inputAlphabetStr = inputAlphabetStr.replaceAll("\\[", "");
+			inputAlphabetStr = inputAlphabetStr.replaceAll("\\]", "");
+			
+			String[] alphabetLetters = inputAlphabetStr.split(",");
+			
+			txtInputAlphabet.setText("");;
+			for (String str : alphabetLetters){
+				str = str.replaceAll("\"", "");
+				txtInputAlphabet.append(str +"\n");
+			}
+
+			txtStates.setText("");
+			finalStateList.removeAll();
+			
+			DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
+			
+			DefaultListModel<String> listModel = (DefaultListModel<String>) finalStateList.getModel();
+			listModel.removeAllElements();
+			
+			for (String s : states) {
+				txtStates.append(s +"\n");
+				initialStateCombo.addItem(s);
+				comboModel.addElement(s);
+				listModel.addElement(s);
+			}
+			initialStateCombo.setModel(comboModel);
+			initialStateCombo.setSelectedItem(initialState);
+			finalStateList.setModel(listModel);
+			
+		}
+
+	}
+
+	class SaveListener implements ActionListener {
+
+		private JTabbedPane pane;
+
+		public SaveListener(JTabbedPane pane) {
+			this.pane = pane;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			int index = pane.getSelectedIndex();
+			Component tab = pane.getComponent(index);
+
+			String name = tab.getName();
+
+			if (name == "RegexToFA") {
+				System.out.println("got regex tab");
+
+				String fileName = JOptionPane.showInputDialog(frame, "Enter a name for the file", "Saving..",
+						JOptionPane.WARNING_MESSAGE);
+
+				rwu.writeToFile(txtRegex.getText(), fileName);
+
+			} else {
+				// FAToRegex
+				System.out.println("got fa tab");
+
+				if (faToConvert != null) {
+
+					String fileName = JOptionPane.showInputDialog(frame, "Enter a name for the file", "Saving..",
+							JOptionPane.WARNING_MESSAGE);
+
+					rwu.writeToFile(faToConvert, fileName);
+				} else {
+					String message = "Please click convert button to create FA, and then save";
+					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+
+				}
+			}
+		}
 	}
 
 	private void setUpFAPanel() {
@@ -211,9 +486,6 @@ public class Converter {
 					}
 				}
 				finalStateList.setModel(model);
-
-				// finalStateList.add
-				// rightPanel.repaint();
 			}
 
 		});
@@ -325,7 +597,7 @@ public class Converter {
 
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == btnRegexConvert) {
-				String regex = txtField.getText();
+				String regex = txtRegex.getText();
 				faDiagramRegexPanel.convertToFa(regex);
 
 				faDiagramRegexPanel.repaint();
@@ -419,8 +691,8 @@ public class Converter {
 						// it will all be initialised at this point, since its
 						// inside all of the if statements
 						System.out.println("creating fa");
-						Finite_Automata fa = createFA(initialState, finalStates, states, inputAlphabet);
-						faDiagramFAPanel.convertToRegex(fa);
+						faToConvert = createFA(initialState, finalStates, states, inputAlphabet);
+						faDiagramFAPanel.convertToRegex(faToConvert);
 
 					} else {
 						String message = "Please choose a final state. To select multiple hold the 'command' key";
@@ -528,15 +800,12 @@ class FAConverterPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (fa != null) {
-			FA_Drawer drawer = new FA_Drawer();
-			drawer.drawFA(g, fa);
-		}
-		if (fa != null) {
 
 			FA_Drawer drawer = new FA_Drawer();
 			drawer.drawFA(g, fa);
+
+			// TODO
 			g.drawString(regex, 50, 50);
-
 		}
 	}
 
@@ -545,11 +814,7 @@ class FAConverterPanel extends JPanel {
 
 		FA_to_Regex converter = new FA_to_Regex();
 		// this.regex = converter.convert(fa);
-
-		// take in details of fa
-		// draw fa on screen
-		// convert fa to regex
-		// display regex
+		// TODO
 
 		repaint();
 	}
