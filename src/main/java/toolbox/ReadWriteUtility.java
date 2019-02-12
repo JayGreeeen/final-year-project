@@ -41,7 +41,6 @@ public class ReadWriteUtility {
 	}
 
 	public void writeToFile(Finite_Automata fa, String filename) {
-		System.out.println("writing fa to file");
 		String faString = gson.toJson(fa);
 
 		File folder = createFAFolder();
@@ -123,7 +122,6 @@ public class ReadWriteUtility {
 	}
 
 	public String ReadFAFromFile(String filename) {
-		System.out.println("reading fa from file");
 		File folder = createFAFolder();
 
 		boolean check = new File(folder, filename).exists();
@@ -150,9 +148,7 @@ public class ReadWriteUtility {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		}
-		// System.out.println("file does not exist");
 		return "";
 	}
 

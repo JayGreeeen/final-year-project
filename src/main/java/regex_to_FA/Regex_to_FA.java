@@ -22,21 +22,19 @@ public class Regex_to_FA {
 	public Finite_Automata convertToFA(String regex) {
 		regex = regex.replace(" ", "");
 		System.out.println("Regex - " + regex);
-		chars = regex.toCharArray();
+		// chars = regex.toCharArray();
 
-		boolean valid = validate(regex);
-		if (!valid) {
-			System.out.println("Regex not valid");
-		} else {
-//			System.out.println("building tree");
-			Tree_Node root = (new Tree_Builder(regex)).buildTree();
+		// boolean valid = validate(regex);
+		// if (valid == false) {
+		// System.out.println("Regex not valid");
+		// } else {
+		// System.out.println("building tree");
+		Tree_Node root = (new Tree_Builder(regex)).buildTree();
+		Finite_Automata FA = generateFA(root);
+		return FA;
 
-//			Print_Tree.print(root);
-			Finite_Automata FA = generateFA(root);
-			return FA;
-			
-		}
-		return null;
+		// }
+		// return null;
 	}
 
 	private Finite_Automata generateFA(Tree_Node node) {
@@ -50,67 +48,77 @@ public class Regex_to_FA {
 			// not a leaf node
 
 			if (node.getLeftChild() != null) {
-//				System.out.println("\tGenerating FA for left child");
+				// System.out.println("\tGenerating FA for left child");
 				Finite_Automata leftFA = generateFA(node.getLeftChild());
-//				System.out.println("Left child: " + leftFA);
+				// System.out.println("Left child: " + leftFA);
 
 				if (node instanceof StarNode) {
-//					System.out.println("Adding star operator to left child");
+					// System.out.println("Adding star operator to left child");
 					return builder.addStarOperator(leftFA);
 				} else {
 
 					if (node.getRightChild() != null) {
-//						System.out.println("\tGenerating FA for right child");
+						// System.out.println("\tGenerating FA for right
+						// child");
 						Finite_Automata rightFA = generateFA(node.getRightChild());
-//						System.out.println("Right child: " + rightFA);
-						
+						// System.out.println("Right child: " + rightFA);
+
 						if (node instanceof UnionNode) {
 							// use rule 3 to connect child NFAs
-//							System.out.println("\tCombining child nodes with |");
+							// System.out.println("\tCombining child nodes with
+							// |");
 							return builder.combineWithUnion(leftFA, rightFA);
-							
+
 						} else if (node instanceof ConcatNode) {
 							// use rule 4 to connect child NFAs
-//							System.out.println("\tCombining child nodes with •");
+							// System.out.println("\tCombining child nodes with
+							// •");
 							return builder.combineWithConcat(leftFA, rightFA);
 						}
 					} else {
 						// no right child - should never be the case
-//						System.out.println("No right child found");
+						// System.out.println("No right child found");
 					}
 				}
 			}
-			// the root node is none of the above - problem 
+			// the root node is none of the above - problem
 			return null;
 		}
 	}
 
-	private boolean validate(String regex) {
+	public String validate(String regex) {
+		chars = regex.toCharArray();
 		boolean bracketsMatch = validateBrackets(regex);
-		if (!bracketsMatch) {
-			System.out.println("brackets dont match");
-			return false;
+
+		if (bracketsMatch == false) {
+			// System.out.println("brackets dont match");
+			return "Brackets do not match";
+			// return false;
 		}
 
 		boolean validSymbols = validateSymbols(regex);
-		if (!validSymbols) {
-			System.out.println("symbols not valid");
-			return false;
+		if (validSymbols == false) {
+			// System.out.println("symbols not valid");
+			return "Symbols not valid";
+			// return false;
 		}
 
 		boolean validKleene = validateKleeneStar(regex);
-		if (!validKleene) {
-			System.out.println("Use of Kleene star not valid");
-			return false;
+		if (validKleene == false) {
+			// System.out.println("Use of Kleene star not valid");
+			return "Use of Kleene star * not valid";
+//			return false;
 		}
 
 		boolean validUnion = validateUnion(regex);
-		if (!validUnion) {
-			System.out.println("Use of union not valid");
-			return false;
+		if (validUnion == false) {
+			// System.out.println("Use of union not valid");
+			return "Use of union | not valid";
+			// return false;
 		}
 
-		return true;
+		return "";
+		// return true;
 	}
 
 	private boolean validateSymbols(String regex) {
@@ -127,7 +135,7 @@ public class Regex_to_FA {
 	}
 
 	private boolean validateBrackets(String regex) {
-		if (!regex.contains("(") || !regex.contains(")")) {
+		if (!regex.contains("(") && !regex.contains(")")) {
 			return true;
 		}
 		int openCount = StringUtils.countMatches(regex, '(');
