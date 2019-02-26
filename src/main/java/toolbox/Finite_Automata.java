@@ -1,6 +1,8 @@
 package toolbox;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Finite_Automata {
 
@@ -10,7 +12,6 @@ public class Finite_Automata {
 	private ArrayList<State> states;
 	// private TransitionTable transitions;
 
-
 	public Finite_Automata(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
 			ArrayList<String> inputAlphabet) {
 		this.initialState = initialState;
@@ -19,8 +20,8 @@ public class Finite_Automata {
 		this.inputAlphabet = inputAlphabet;
 		// this.transitions = transitions;
 	}
-	
-	public void removeState(State state){
+
+	public void removeState(State state) {
 		states.remove(state);
 	}
 
@@ -63,6 +64,67 @@ public class Finite_Automata {
 
 		return "States: " + states + "\nInitial state: " + initialState + "\nFinal state(s): " + finalStates
 				+ "\nInput alphabet: " + inputAlphabet + "\nTransitions: " + transitionOutput;
+	}
+
+	public Finite_Automata copy() {
+		ArrayList<State> finalStatesList = new ArrayList<>();
+//		finalStatesList.addAll(finalStates);
+		
+		State initial = initialState;
+
+		ArrayList<State> stateList = new ArrayList<>();
+		for (State s : states){
+			State newState = new State(s.getLabel());
+			
+			if (s.isFinalState()){
+				newState.setFinal(true);
+				finalStatesList.add(newState);
+			}
+			if (s.isInitialState()){
+				newState.setInitial(true);
+				initial = newState;
+			}
+			
+			stateList.add(newState);
+		}
+		
+		for (State s : states){
+			
+			// need to first make the list, and then go through and add all the transitions to it
+			// pretty sure have done this once in the class that builds the FA from the front end
+			// so check that
+			
+			State newState = getState(s.getLabel(), stateList);
+			
+			Map<State, ArrayList<String>> map = s.getTransitions();
+			
+			for (Entry<State, ArrayList<String>> e : map.entrySet()){
+				
+//				State old = (State) e.getKey();
+				State to = getState(((State) e.getKey()).getLabel(), stateList);
+				
+				ArrayList<String> transitions = (ArrayList<String>) e.getValue();
+				
+				for (String label : transitions){
+					newState.addTransition(to, label);
+				}
+			}
+		}
+		
+		ArrayList<String> inputList = new ArrayList<>();
+		inputList.addAll(inputAlphabet);
+
+		
+		return new Finite_Automata(initial, finalStatesList, stateList, inputList);
+	}
+	
+	private State getState(String label, ArrayList<State> states) {
+		for (State state : states) {
+			if (state.getLabel().equals(label)) {
+				return state;
+			}
+		}
+		return null;
 	}
 
 }

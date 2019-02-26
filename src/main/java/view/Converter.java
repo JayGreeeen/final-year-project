@@ -1,4 +1,4 @@
-package frontend;
+package view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,6 +45,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import fa_to_regex.FA_to_Regex;
+import model.FA_Converter_Panel;
+import model.Regex_Converter_Panel;
 import regex_to_fa.Regex_to_FA;
 import toolbox.Finite_Automata;
 import toolbox.ReadWriteUtility;
@@ -68,17 +70,18 @@ public class Converter {
 	// regex to FA
 	private JButton btnRegexConvert;
 	private JTextField txtRegex;
-	private RegexConverterPanel faDiagramRegexPanel;
+	private Regex_Converter_Panel faDiagramRegexPanel;
 
 	// FA to Regex
 	private JButton btnFAConvert;
 	private JTextArea txtInputAlphabet;
 	private JTextArea txtStates;
-	private FAConverterPanel faDiagramFAPanel;
+	private FA_Converter_Panel faDiagramFAPanel;
 	private JTable transitionTable;
 	private JComboBox<String> initialStateCombo;
 	private JList<String> finalStateList;
 	private Finite_Automata faToConvert = null;
+	private JLabel lblRegex;
 
 	public static void main(String[] args) {
 		createAndShowGUI();
@@ -165,7 +168,7 @@ public class Converter {
 
 		regexCard.add(panel, BorderLayout.NORTH);
 
-		faDiagramRegexPanel = new RegexConverterPanel();
+		faDiagramRegexPanel = new Regex_Converter_Panel();
 		faDiagramRegexPanel.setPreferredSize(new Dimension(2500, 180));
 		
 		JScrollPane scroll = new JScrollPane(faDiagramRegexPanel);
@@ -425,7 +428,7 @@ public class Converter {
 		faCard.setLayout(new BorderLayout());
 
 		// fa panel
-		faDiagramFAPanel = new FAConverterPanel();
+		faDiagramFAPanel = new FA_Converter_Panel();
 		faDiagramFAPanel.setPreferredSize(new Dimension(1500, 180));
 
 		JPanel topPanel = new JPanel(new BorderLayout());
@@ -456,6 +459,7 @@ public class Converter {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				drawTable(transitionPanel, txtStates.getText());
+				faDiagramFAPanel.resetRegexLabelText();
 			}
 		});
 		transitionPanel.add(clear, BorderLayout.SOUTH);
@@ -553,9 +557,51 @@ public class Converter {
 
 		JScrollPane topScrollPane = new JScrollPane(topPanel);
 		JScrollPane bottomScrollPane = new JScrollPane(faDiagramFAPanel);
+		
+		// ***************
+		JPanel bottomPanel = new JPanel(new BorderLayout());
+		bottomPanel.add(bottomScrollPane, BorderLayout.CENTER);
+		
+		JPanel buttonPanel = new JPanel(new FlowLayout());
+		
+		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				faDiagramFAPanel.removeState();
+			}
+		});
+		
+		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				faDiagramFAPanel.previousState();
+			}
+		});
+		
+		JLabel lblRegex = new JLabel();
+		
+		JPanel panel = new JPanel(new FlowLayout());
+		panel.add(new JLabel("Regex:"));
+		panel.add(lblRegex);
+		faDiagramFAPanel.setRegexLabel(lblRegex);
+		
+		buttonPanel.add(btnNext);
+		buttonPanel.add(btnBack);
+		
+		bottomPanel.add(buttonPanel, BorderLayout.EAST);
+		
+		bottomPanel.add(panel, BorderLayout.SOUTH);
+		// ***************
+		
+		
 		bottomScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topScrollPane, bottomScrollPane);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topScrollPane, bottomPanel);
+//		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topScrollPane, bottomScrollPane);
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setMinimumSize(new Dimension(frameWidth, frameHeight));
 
@@ -613,6 +659,7 @@ public class Converter {
 
 			if (e.getSource() == btnFAConvert) {
 				drawAndConvertFA();
+				faDiagramFAPanel.resetRegexLabelText();
 			}
 		}
 
@@ -696,7 +743,8 @@ public class Converter {
 						// it will all be initialised at this point, since its
 						// inside all of the if statements
 						faToConvert = createFA(initialState, finalStates, states, inputAlphabet);
-						faDiagramFAPanel.convertToRegex(faToConvert);
+						faDiagramFAPanel.setFA(faToConvert);
+						faDiagramFAPanel.repaint();;
 
 					} else {
 						String message = "Please choose a final state. To select multiple hold the 'command' key";
@@ -761,73 +809,80 @@ public class Converter {
 
 }
 
-class RegexConverterPanel extends JPanel {
+//class RegexConverterPanel extends JPanel {
+//
+//	private Finite_Automata fa = null;
+//	
+//	// ***********
+//	private FA_Drawer drawer;
+//	
+//	public RegexConverterPanel() {
+//		setBackground(Color.white);
+//		setMinimumSize(new Dimension(100, 300));
+//		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//	}
+//
+//	public void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		drawer = new FA_Drawer(g);
+//		
+////		if (fa != null) {
+////			drawer.drawFA(fa);
+////		}
+//	}
+//
+//	public void convertToFa(String regex) {
+//		
+//		Regex_to_FA converter = new Regex_to_FA();
+//		
+//		
+//
+//		String errorMessage = converter.validate(regex);
+//
+//		if (errorMessage == "") {
+//			Finite_Automata fa = converter.convertToFA(regex);
+//			this.fa = fa;
+//			repaint();
+//		} else {
+//			String message = "Please enter a valid regex. " + errorMessage;
+//			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+//		}
+//	}
+//
+//}
 
-	private Finite_Automata fa = null;
-
-	public RegexConverterPanel() {
-		setBackground(Color.white);
-		setMinimumSize(new Dimension(100, 300));
-		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-	}
-
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		if (fa != null) {
-			FA_Drawer drawer = new FA_Drawer();
-			drawer.drawFA(g, fa);
-		}
-	}
-
-	public void convertToFa(String regex) {
-		Regex_to_FA converter = new Regex_to_FA();
-
-		String errorMessage = converter.validate(regex);
-
-		if (errorMessage == "") {
-			Finite_Automata fa = converter.convertToFA(regex);
-			this.fa = fa;
-			repaint();
-		} else {
-			String message = "Please enter a valid regex. " + errorMessage;
-			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
-}
-
-class FAConverterPanel extends JPanel {
-
-//	private String regex = "";
-	private Finite_Automata fa = null;
-
-	public FAConverterPanel() {
-		setBackground(Color.white);
-		setMinimumSize(new Dimension(100, 300));
-		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-	}
-
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		if (fa != null) {
-
-			FA_Drawer drawer = new FA_Drawer();
-			drawer.drawFA(g, fa);
-
-			// TODO
-			
-			FA_to_Regex converter = new FA_to_Regex();
-			String regex = converter.convert(fa);
-			g.drawString(regex, 50, 50);
-		}
-	}
-
-	public void convertToRegex(Finite_Automata fa) {
-		this.fa = fa;
-
-		// TODO
-
-		repaint();
-	}
-
-}
+//class FAConverterPanel extends JPanel {
+//
+////	private String regex = "";
+//	private Finite_Automata fa = null;
+//
+//	public FAConverterPanel() {
+//		setBackground(Color.white);
+//		setMinimumSize(new Dimension(100, 300));
+//		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+//	}
+//
+//	public void paintComponent(Graphics g) {
+//		super.paintComponent(g);
+//		if (fa != null) {
+//
+//			FA_Drawer drawer = new FA_Drawer(g);
+//			drawer.drawFA(fa);
+//
+//			// TODO
+//			
+//			FA_to_Regex converter = new FA_to_Regex();
+//			String regex = converter.convert(fa);
+//			g.drawString(regex, 50, 50);
+//		}
+//	}
+//
+//	public void convertToRegex(Finite_Automata fa) {
+//		this.fa = fa;
+//
+//		// TODO
+//
+//		repaint();
+//	}
+//
+//}

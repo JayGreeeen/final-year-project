@@ -1,5 +1,14 @@
 package regex_to_fa;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.image.ImageObserver;
+import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -11,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import toolbox.Finite_Automata;
 import toolbox.State;
+import view.FA_Drawer;
 
 public class Regex_to_FA_Test {
 	private ArrayList<String> inputAlphabet = new ArrayList<String>();
@@ -28,6 +38,8 @@ public class Regex_to_FA_Test {
 		inputAlphabet.add("a");
 
 		String regex = "a";
+		
+		// *********
 		Regex_to_FA converter = new Regex_to_FA();
 		Finite_Automata actualFA = converter.convertToFA(regex);
 

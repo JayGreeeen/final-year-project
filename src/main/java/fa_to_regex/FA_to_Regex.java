@@ -13,44 +13,15 @@ public class FA_to_Regex {
 	}
 
 	public String convert(Finite_Automata fa) {
-		ArrayList<State> finalStates = fa.getFinalStates();
-		ArrayList<State> states = new ArrayList<State>();
-		states.addAll(fa.getStates());
 
-		State initial = fa.getInitialState();
-		State finalState;
-		
-		states.remove(initial);
+//		String regex = remover.cleanUpInitialAndFinalStates(fa);
+		String regex = "";
 
-		if (finalStates.size() > 1) { // more than one final state
-			finalState = new State(Integer.toString(fa.getStateCount() + 1));
-			newFinalState(finalStates, finalState);
-
-			finalStates.clear();
-			finalStates.add(finalState);
-			fa = new Finite_Automata(initial, finalStates, states, fa.getInputAlphabet());
-			// adds the new final state to the automaton
-
-		} else { // there is only one final state
-			finalState = finalStates.get(0);
-			states.remove(finalState);
-		}
-		
-		
-		if (!states.isEmpty()) {
-			removeStates(states, fa);
-		}
-
-		String regex = remover.cleanUpInitialAndFinalStates(fa);
-
-//		if (regex.startsWith("(") && regex.endsWith(")")){
-//			regex = regex.substring(1, regex.length() - 1);
-//		}
 		System.out.println("Regex: " + regex);
 		return regex;
 	}
 
-	private void newFinalState(ArrayList<State> finalStates, State finalState) {
+	private void createNewFinalState(ArrayList<State> finalStates, State finalState) {
 		for (State state : finalStates) {
 			state.setFinal(false);
 			state.addEmptyTransition(finalState);
@@ -58,10 +29,47 @@ public class FA_to_Regex {
 
 	}
 
-	private void removeStates(ArrayList<State> states, Finite_Automata fa) {
-		for (State state : states) {
-			remover.removeConnectionsTo(state, fa);
-		}
+//	private void removeStates(ArrayList<State> states, Finite_Automata fa) {
+//		for (State state : states) {
+//			remover.removeConnectionsTo(state, fa);
+//		}
+//	}
+
+	public ArrayList<State> getStatesToRemove(Finite_Automata fa) {
+		ArrayList<State> states = new ArrayList<State>();
+		states.addAll(fa.getStates());
+
+		State initial = fa.getInitialState();
+		State finalState;
+
+		states.remove(initial);
+
+		finalState = fa.getFinalStates().get(0);
+		states.remove(finalState);
+
+		return states;
+	}
+
+	public Finite_Automata reduceFinalStateCount(Finite_Automata fa) {
+		ArrayList<State> finalStates = fa.getFinalStates();
+		// state count might be 3, but may be labled 1-3
+		State finalState = new State("end");
+		
+		finalState.setFinal(true);
+		
+		createNewFinalState(finalStates, finalState);
+
+		ArrayList<State> states = fa.getStates();
+		states.add(finalState);
+		
+		finalStates = new ArrayList<>();
+		finalStates.add(finalState);
+		fa = new Finite_Automata(fa.getInitialState(), finalStates, states, fa.getInputAlphabet());
+		// adds the new final state to the automaton
+
+		System.out.println("added new final state: " + fa.getStates());
+		
+		return fa;
 	}
 
 }

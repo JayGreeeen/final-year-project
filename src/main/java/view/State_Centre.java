@@ -1,4 +1,4 @@
-package frontend;
+package view;
 
 public class State_Centre {
 

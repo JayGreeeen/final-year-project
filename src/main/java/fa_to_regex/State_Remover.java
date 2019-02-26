@@ -47,7 +47,8 @@ public class State_Remover {
 				System.out.println("\tcreating transition from " + startState + " to " + endState);
 
 				String label = createUnionLabel(startState.getTransitionsTo(state));
-//				System.out.println("Label, " + startState + " to " + state + ": " + label);
+				// System.out.println("Label, " + startState + " to " + state +
+				// ": " + label);
 
 				String selfPointingLabel = createUnionLabel(state.getTransitionsTo(state));
 				if (selfPointingLabel != "") {
@@ -56,8 +57,8 @@ public class State_Remover {
 
 				label += createUnionLabel(state.getTransitionsTo(endState));
 				startState.addTransition(endState, label);
-				System.out
-						.println("\tAdding transition from " + startState + " to " + endState + " with label: " + label);
+				System.out.println(
+						"\tAdding transition from " + startState + " to " + endState + " with label: " + label);
 
 			}
 		}
@@ -68,62 +69,22 @@ public class State_Remover {
 		for (State endState : endStates) {
 			state.removeTransitionTo(endState);
 		}
+
+		oldfa.removeState(state);
+	}
+	
+	// TODO 
+	// ***************************
+	// the case for when the initial and final states are the same
+	private void singleStateAutomaton(Finite_Automata fa) {
+		cleanUpSelfPointingArrows(fa.getInitialState());
 	}
 
-	protected String cleanUpInitialAndFinalStates(Finite_Automata fa) {
-		// remove any self pointing arrows
-		// remove multiple arrows to initial / final state
-		State initial = fa.getInitialState();
-		State finalState = fa.getFinalStates().get(0);
-
-		if (initial == finalState) {
-			return singleStateAutomaton(fa);
-		}
-
-		// clean up initial
-		System.out.println("initial: " + initial.getTransitions());
-		System.out.println("finalState: " + finalState.getTransitions());
-		
-		String initialToFinal = cleanUpMultiArrows(initial, finalState);
-		String finalToInitial = cleanUpMultiArrows(finalState, initial);
-		String initialToInitial = cleanUpSelfPointingArrows(initial);
-		String finalToFinal = cleanUpSelfPointingArrows(finalState);
-
-		String regex = initialToFinal;
-		String f2i = finalToInitial;
-
-		if (!initialToInitial.equals("-") && !initialToInitial.equals("")) {
-			System.out.println("Adding " + initialToInitial + " to start of " + regex);
-
-			regex = initialToInitial + initialToFinal;
-			f2i += initialToInitial;
-		}
-
-//		if (finalToFinal != "-" && finalToFinal != "") {
-		if (!finalToFinal.equals("-") && !finalToFinal.equals("")) {
-			System.out.println("Adding " + finalToFinal + " to end of " + regex);
-			regex += finalToFinal;
-			f2i = finalToFinal + f2i;
-		}
-
-//		if (finalToInitial != "-" && finalToInitial != "") {
-		if (!finalToInitial.equals("-") && !finalToInitial.equals("")) {
-			System.out.println("adding " + f2i + " as choice: " + "(" + f2i + regex + ")*");
-			regex = regex + "|" + "(" + regex + f2i + regex + ")*";
-		}
-
-		return regex;
-	}
-
-	private String singleStateAutomaton(Finite_Automata fa) {
-		return cleanUpSelfPointingArrows(fa.getInitialState());
-	}
-
-	private String cleanUpSelfPointingArrows(State state) {
+	public void cleanUpSelfPointingArrows(State state) {
 		ArrayList<String> transitions = state.getTransitionsTo(state);
 		String label = "";
 
-		if (transitions.size() > 0 && !transitions.get(0).equals("-")) {
+		if (transitions.size() > 0) {
 			if (transitions.size() > 1) {
 				label = createUnionLabel(transitions);
 			} else {
@@ -133,18 +94,17 @@ public class State_Remover {
 			label = createStarLabel(label);
 			state.removeTransitionTo(state);
 			state.addTransition(state, label);
-			System.out.println("self pointing label: " + label);
 		}
-		return label;
+		
+		state.removeTransitionTo(state);
+		state.addTransition(state, label);
 	}
 
-	private String cleanUpMultiArrows(State from, State to) {
+	public void cleanUpMultiArrows(State from, State to) {
 		ArrayList<String> transitions = from.getTransitionsTo(to);
 		String label = "";
-		
-//		System.out.println("found mutliple transitions: " + from + " to " + to + ": " + from.getTransitionsTo(to));
 
-		if (transitions.size() > 0 && transitions.get(0) != "-") {
+		if (transitions.size() > 0) {
 			if (transitions.size() > 1) {
 				label = createUnionLabel(transitions);
 			} else {
@@ -152,10 +112,12 @@ public class State_Remover {
 			}
 			from.removeTransitionTo(to);
 			from.addTransition(to, label);
-			System.out.println("multi arrow label: " + label);
 
 		}
-		return label;
+		
+		from.removeTransitionTo(to);
+		from.addTransition(to, label);
+		
 	}
 
 	private String createStarLabel(String l) {
@@ -166,7 +128,6 @@ public class State_Remover {
 		} else if (l.length() > 1) {
 			label = "(" + l + ")*";
 		}
-		// System.out.println("creating star label: " + label);
 		return label;
 	}
 
@@ -177,18 +138,15 @@ public class State_Remover {
 	private String createUnionLabel(ArrayList<String> labels) {
 		String label = "";
 
-		for (String l : labels) {
-			if (l != "-") {
-				label += l;
-				if (labels.indexOf(l) != labels.size() - 1) {
-					label += "|";// not the last label
-				}
+		for (int i = 0; i < labels.size(); i++){
+			String l = labels.get(i);
+			label += l;
+			
+			if (i != labels.size() - 1){
+				label += "|";
 			}
 		}
-		if (label.length() > 1 && label.contains("|")) {
-			label = "(" + label + ")";
-		}
-		// System.out.println("Creating union label: " + label);
+		
 		return label;
 	}
 

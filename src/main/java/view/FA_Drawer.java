@@ -1,4 +1,4 @@
-package frontend;
+package view;
 
 import java.awt.Font;
 import java.awt.Graphics;
@@ -15,9 +15,14 @@ import toolbox.State;
 
 public class FA_Drawer {
 
+	private Graphics g; 
 	private final int circle_radius = 20;
+	
+	public FA_Drawer(Graphics g){
+		this.g = g;
+	}
 
-	public void drawFA(Graphics g, Finite_Automata fa) {
+	public void drawFA(Finite_Automata fa) {
 		ArrayList<State> stateList = fa.getStates();
 		Map<State, State_Centre> statePositions = drawStates(g, stateList);
 
@@ -47,12 +52,12 @@ public class FA_Drawer {
 					nextTo = true;
 				}
 
-				drawTransitions(g, startPos, endPos, labels, nextTo, backwardsTransition);
+				drawTransitions(startPos, endPos, labels, nextTo, backwardsTransition);
 			}
 		}
 	}
 
-	private void drawTransitions(Graphics g, State_Centre start, State_Centre end, ArrayList<String> labels,
+	private void drawTransitions(State_Centre start, State_Centre end, ArrayList<String> labels,
 			boolean nextTo, boolean backwardsTransition) {
 		int numLabels = labels.size();
 		int height = 20;

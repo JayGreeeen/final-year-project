@@ -40,8 +40,10 @@ public class State {
 		if (transitions.containsKey(state)) {
 			return transitions.get(state);
 		}
+		
+		
 		ArrayList<String> transitionList = new ArrayList<String>();
-		transitionList.add("-");
+//		transitionList.add("-");
 		return transitionList;
 	}
 

@@ -12,12 +12,16 @@ import toolbox.Tree_Node.ConcatNode;
 import toolbox.Tree_Node.LeafNode;
 import toolbox.Tree_Node.StarNode;
 import toolbox.Tree_Node.UnionNode;
+import view.FA_Drawer;
 
 public class Regex_to_FA {
 
 	private Map<Integer, Integer> bracketMap = new HashMap<Integer, Integer>();
 	private char[] chars;
-
+	
+	//****** 
+//	private FA_Drawer drawer;
+	
 	// take in a regex and turn it into a FA
 	public Finite_Automata convertToFA(String regex) {
 		regex = regex.replace(" ", "");
@@ -29,6 +33,7 @@ public class Regex_to_FA {
 		// System.out.println("Regex not valid");
 		// } else {
 		// System.out.println("building tree");
+		
 		Tree_Node root = (new Tree_Builder(regex)).buildTree();
 		Finite_Automata FA = generateFA(root);
 		return FA;
@@ -44,6 +49,7 @@ public class Regex_to_FA {
 
 		if (node instanceof LeafNode) {
 			return builder.buildSimpleAutomaton((LeafNode) node);
+			
 		} else {
 			// not a leaf node
 
