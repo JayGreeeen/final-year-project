@@ -165,7 +165,7 @@ public class Automaton_Builder {
 		states.addAll(statesSet1);
 		states.addAll(statesSet2);
 
-		int counter = 1;
+		int counter = 1;	// starts from 1, b/c a new initial state has 0
 		for (State state : states) {
 			// System.out.println("Renaming state " + state.getLabel() + " to
 			// state " + counter);
@@ -176,7 +176,7 @@ public class Automaton_Builder {
 	}
 
 	private ArrayList<State> renameStates(ArrayList<State> states) {
-		int counter = 1;
+		int counter = 1; // starts from 1, b/c a new initial state has 0
 		for (State state : states) {
 			// System.out.println("Renaming state " + state.getLabel() + " to
 			// state " + counter);

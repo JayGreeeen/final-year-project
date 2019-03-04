@@ -39,7 +39,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("a");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("a", regex);
 	}
@@ -74,7 +75,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("b");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("ab", regex);
 	}
@@ -115,7 +117,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("b");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("εabε", regex);
 	}
@@ -152,7 +155,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("b");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("(a|b)", regex);
 	}
@@ -201,7 +205,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("b");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("(εaε|εbε)", regex);
 	}
@@ -232,7 +237,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("a");
 
 		Finite_Automata fa = new Finite_Automata(state, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("a*", regex);
 	}
@@ -274,7 +280,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("a");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+		String regex = "";
+//		String regex = converter.convert(fa);
 
 		assertEquals("(ε|εa(εa)*ε)", regex);
 	}
@@ -324,7 +331,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("b");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("(aab|abb)", regex);
 	}
@@ -364,7 +372,8 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("b");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
 
 		assertEquals("a*ab*ba*", regex);
 	}
@@ -416,7 +425,9 @@ public class FA_to_Regex_Test {
 		inputAlphabet.add("c");
 
 		Finite_Automata fa = new Finite_Automata(initial, finalStates, states, inputAlphabet);
-		String regex = converter.convert(fa);
+//		String regex = converter.convert(fa);
+		String regex = "";
+		
 		System.out.println("actual: " + regex);
 
 		String expected = "(a | ac*b)* (a | ac*c) (a | bc*c)*| ( (a | ac*b)* (a | ac*c) "

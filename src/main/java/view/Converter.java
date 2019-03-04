@@ -9,6 +9,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -58,8 +59,10 @@ public class Converter {
 	final static String FA_PANEL = "Convert FA to Regex";
 	final static int extraWindowWidth = 100;
 
-	final static int frameWidth = 1000;
-	final static int frameHeight = 800;
+	private static int frameWidth;
+	private static int frameHeight;
+//	final static int frameWidth = 1000;
+//	final static int frameHeight = 800;
 
 	private static JFrame frame;
 	private JPanel regexCard;
@@ -102,7 +105,16 @@ public class Converter {
 		frame.pack();
 
 		// frame.setSize(1000, 800);
-		frame.setSize(frameWidth, frameHeight);
+
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		
+		frameWidth = screenSize.width;
+		frameHeight = screenSize.height;
+		
+		
+		frame.setBounds(0, 0, frameWidth, frameHeight);
+
+		// frame.setSize(frameWidth, frameHeight);
 		frame.setVisible(true);
 	}
 
@@ -154,7 +166,8 @@ public class Converter {
 	private void setUpRegexPanel() {
 		regexCard.setLayout(new BorderLayout());
 
-		JPanel panel = new JPanel(new FlowLayout());
+		JPanel northPanel = new JPanel(new FlowLayout());
+		JPanel eastPanel = new JPanel(new FlowLayout());
 
 		JLabel lblRegex = new JLabel("Enter regex:");
 		txtRegex = new JTextField();
@@ -162,21 +175,222 @@ public class Converter {
 		btnRegexConvert = new JButton("Convert");
 		btnRegexConvert.addActionListener(new ConvertAction());
 
-		panel.add(lblRegex);
-		panel.add(txtRegex);
-		panel.add(btnRegexConvert);
+		northPanel.add(lblRegex);
+		northPanel.add(txtRegex);
+		northPanel.add(btnRegexConvert);
 
-		regexCard.add(panel, BorderLayout.NORTH);
+		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// faDiagramRegexPanel.drawTree();
+
+				// TODO
+				// *************************
+				faDiagramRegexPanel.drawNext();
+
+			}
+
+		});
+		eastPanel.add(btnNext);
+		regexCard.add(eastPanel, BorderLayout.EAST);
+
+		regexCard.add(northPanel, BorderLayout.NORTH);
 
 		faDiagramRegexPanel = new Regex_Converter_Panel();
-		faDiagramRegexPanel.setPreferredSize(new Dimension(2500, 180));
-		
+		faDiagramRegexPanel.setPreferredSize(new Dimension(2000, 180));
+		faDiagramRegexPanel.setNextButton(btnNext);
+
 		JScrollPane scroll = new JScrollPane(faDiagramRegexPanel);
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		faDiagramRegexPanel.repaint();
-//		regexCard.add(faDiagramRegexPanel, BorderLayout.CENTER);
 		regexCard.add(scroll, BorderLayout.CENTER);
+	}
+
+	private void setUpFAPanel() {
+		faCard.setLayout(new BorderLayout());
+
+		// fa panel
+		faDiagramFAPanel = new FA_Converter_Panel();
+		faDiagramFAPanel.setPreferredSize(new Dimension(1500, 180));
+
+		JPanel topPanel = new JPanel(new BorderLayout());
+		topPanel.setPreferredSize(new Dimension(800, 300));
+		JPanel leftPanel = new JPanel(new GridLayout(2, 1, 10, 10));
+		JPanel middlePanel = new JPanel(new FlowLayout());
+		JPanel rightPanel = new JPanel(new BorderLayout());
+
+		// transition panel
+		JPanel transitionPanel = new JPanel(new BorderLayout());
+		transitionPanel.setPreferredSize(new Dimension(500, 250));
+
+		transitionTable = new JTable();
+		Object[] columns = { "Enter some states" };
+		final DefaultTableModel model = new DefaultTableModel();
+		model.setColumnIdentifiers(columns);
+		transitionTable.setModel(model);
+
+		JLabel lblTransitions = new JLabel("Transitions:");
+		transitionPanel.add(lblTransitions, BorderLayout.NORTH);
+
+		JScrollPane scroll = new JScrollPane(transitionTable);
+		transitionPanel.add(scroll, BorderLayout.CENTER);
+
+		JButton clear = new JButton("Clear table");
+		clear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				drawTable(transitionPanel, txtStates.getText());
+				faDiagramFAPanel.resetRegexLabelText();
+			}
+		});
+		transitionPanel.add(clear, BorderLayout.SOUTH);
+
+		// input states and alphabet
+		txtInputAlphabet = new JTextArea();
+		txtStates = new JTextArea();
+		txtInputAlphabet.setMinimumSize(new Dimension(200, 50));
+
+		txtStates.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				drawTable(transitionPanel, txtStates.getText());
+
+				String[] states = txtStates.getText().split("\n");
+
+				initialStateCombo.removeAllItems();
+				finalStateList.removeAll();
+
+				DefaultListModel<String> model = (DefaultListModel<String>) finalStateList.getModel();
+				model.removeAllElements();
+				for (String s : states) {
+					s.trim();
+					if (s.length() != 0) {
+						initialStateCombo.addItem(s);
+						model.addElement(s);
+					}
+				}
+				finalStateList.setModel(model);
+			}
+		});
+
+		JLabel lblAlphabet = new JLabel("Alphabet:");
+		JLabel lblStates = new JLabel("States:");
+
+		// right panel
+		String[] tmp = { "-" };
+		initialStateCombo = new JComboBox<String>(tmp);
+
+		JPanel initialStatePanel = new JPanel(new FlowLayout());
+		initialStatePanel.add(new JLabel("Initial state:"));
+		initialStatePanel.add(initialStateCombo);
+
+		JPanel finalStatePanel = new JPanel(new BorderLayout());
+		finalStatePanel.add(new JLabel("Final state(s):"), BorderLayout.NORTH);
+
+		finalStateList = new JList<String>();
+
+		finalStateList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		DefaultListModel<String> listModel = new DefaultListModel<String>();
+		listModel.addElement("-");
+		finalStateList.setModel(listModel);
+		finalStatePanel.add(finalStateList, BorderLayout.CENTER);
+
+		JScrollPane finalStateScroll = new JScrollPane(finalStatePanel);
+
+		rightPanel.add(initialStatePanel, BorderLayout.NORTH);
+		rightPanel.add(finalStateScroll, BorderLayout.CENTER);
+
+		btnFAConvert = new JButton("Convert");
+		btnFAConvert.addActionListener(new ConvertAction());
+
+		JPanel alphabetPanel = new JPanel(new BorderLayout());
+		JPanel statePanel = new JPanel(new BorderLayout());
+
+		alphabetPanel.add(lblAlphabet, BorderLayout.NORTH);
+		alphabetPanel.add(txtInputAlphabet, BorderLayout.CENTER);
+
+		statePanel.add(lblStates, BorderLayout.NORTH);
+		statePanel.add(txtStates, BorderLayout.CENTER);
+
+		JScrollPane alphabetScrollPane = new JScrollPane(alphabetPanel);
+		JScrollPane stateScrollPane = new JScrollPane(statePanel);
+
+		leftPanel.add(alphabetScrollPane);
+		leftPanel.add(stateScrollPane);
+
+		stateScrollPane.setPreferredSize(new Dimension(150, 300));
+
+		middlePanel.add(transitionPanel);
+		rightPanel.add(btnFAConvert, BorderLayout.SOUTH);
+
+		topPanel.add(leftPanel, BorderLayout.WEST);
+		topPanel.add(middlePanel, BorderLayout.CENTER);
+		topPanel.add(rightPanel, BorderLayout.EAST);
+
+		JScrollPane topScrollPane = new JScrollPane(topPanel);
+		JScrollPane bottomScrollPane = new JScrollPane(faDiagramFAPanel);
+
+		JPanel bottomPanel = new JPanel(new BorderLayout());
+		bottomPanel.add(bottomScrollPane, BorderLayout.CENTER);
+
+		JPanel buttonPanel = new JPanel(new FlowLayout());
+
+		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				faDiagramFAPanel.removeState();
+			}
+		});
+
+		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				faDiagramFAPanel.previousState();
+			}
+		});
+
+		JLabel lblRegex = new JLabel();
+
+		JPanel panel = new JPanel(new FlowLayout());
+		panel.add(new JLabel("Regex:"));
+		panel.add(lblRegex);
+		faDiagramFAPanel.setRegexLabel(lblRegex);
+
+		buttonPanel.add(btnNext);
+		buttonPanel.add(btnBack);
+		faDiagramFAPanel.setNextButton(btnNext);
+		faDiagramFAPanel.setBackButton(btnBack);
+
+		bottomPanel.add(buttonPanel, BorderLayout.EAST);
+		bottomPanel.add(panel, BorderLayout.SOUTH);
+
+		bottomScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		bottomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topScrollPane, bottomPanel);
+		// JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+		// topScrollPane, bottomScrollPane);
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setMinimumSize(new Dimension(frameWidth, frameHeight));
+
+		faCard.add(splitPane, BorderLayout.CENTER);
 	}
 
 	class OpenListener implements ActionListener {
@@ -199,7 +413,7 @@ public class Converter {
 			String workingDir = System.getProperty("user.dir");
 
 			if (name == "RegexToFA") {
-				File dir = new File(workingDir + targetFolder, "Saved Regex's");
+				File dir = new File(workingDir + targetFolder, "Saved Regexs");
 
 				JFileChooser jfc = new JFileChooser(dir);
 				int returnValue = jfc.showOpenDialog(null);
@@ -338,7 +552,6 @@ public class Converter {
 								label += ", ";
 							}
 						}
-
 						row.add(label);
 					} else {
 						row.add(" ");
@@ -356,7 +569,7 @@ public class Converter {
 			String[] alphabetLetters = inputAlphabetStr.split(",");
 
 			txtInputAlphabet.setText("");
-			;
+
 			for (String str : alphabetLetters) {
 				str = str.replaceAll("\"", "");
 				txtInputAlphabet.append(str + "\n");
@@ -424,190 +637,6 @@ public class Converter {
 		}
 	}
 
-	private void setUpFAPanel() {
-		faCard.setLayout(new BorderLayout());
-
-		// fa panel
-		faDiagramFAPanel = new FA_Converter_Panel();
-		faDiagramFAPanel.setPreferredSize(new Dimension(1500, 180));
-
-		JPanel topPanel = new JPanel(new BorderLayout());
-		topPanel.setPreferredSize(new Dimension(800, 300));
-		JPanel leftPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-		JPanel middlePanel = new JPanel(new FlowLayout());
-		JPanel rightPanel = new JPanel(new BorderLayout());
-
-		// transition panel
-		JPanel transitionPanel = new JPanel(new BorderLayout());
-		transitionPanel.setPreferredSize(new Dimension(500, 250));
-
-		transitionTable = new JTable();
-		Object[] columns = { "Enter some states" };
-		final DefaultTableModel model = new DefaultTableModel();
-		model.setColumnIdentifiers(columns);
-		transitionTable.setModel(model);
-
-		JLabel lblTransitions = new JLabel("Transitions:");
-		transitionPanel.add(lblTransitions, BorderLayout.NORTH);
-
-		JScrollPane scroll = new JScrollPane(transitionTable);
-		transitionPanel.add(scroll, BorderLayout.CENTER);
-
-		JButton clear = new JButton("Clear table");
-		clear.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				drawTable(transitionPanel, txtStates.getText());
-				faDiagramFAPanel.resetRegexLabelText();
-			}
-		});
-		transitionPanel.add(clear, BorderLayout.SOUTH);
-
-		// input states and alphabet
-		txtInputAlphabet = new JTextArea();
-		txtStates = new JTextArea();
-		txtInputAlphabet.setMinimumSize(new Dimension(200, 50));
-
-		txtStates.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				drawTable(transitionPanel, txtStates.getText());
-
-				String[] states = txtStates.getText().split("\n");
-
-				initialStateCombo.removeAllItems();
-				finalStateList.removeAll();
-
-				DefaultListModel<String> model = (DefaultListModel<String>) finalStateList.getModel();
-				model.removeAllElements();
-				for (String s : states) {
-					s.trim();
-					if (s.length() != 0) {
-						initialStateCombo.addItem(s);
-						model.addElement(s);
-					}
-				}
-				finalStateList.setModel(model);
-			}
-		});
-
-		JLabel lblAlphabet = new JLabel("Alphabet:");
-		JLabel lblStates = new JLabel("States:");
-
-		// right panel
-		String[] tmp = { "-" };
-		initialStateCombo = new JComboBox<String>(tmp);
-
-		JPanel initialStatePanel = new JPanel(new FlowLayout());
-		initialStatePanel.add(new JLabel("Initial state:"));
-		initialStatePanel.add(initialStateCombo);
-
-		JPanel finalStatePanel = new JPanel(new BorderLayout());
-		finalStatePanel.add(new JLabel("Final state(s):"), BorderLayout.NORTH);
-
-		finalStateList = new JList<String>();
-
-		finalStateList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		DefaultListModel<String> listModel = new DefaultListModel<String>();
-		listModel.addElement("-");
-		finalStateList.setModel(listModel);
-		finalStatePanel.add(finalStateList, BorderLayout.CENTER);
-
-		JScrollPane finalStateScroll = new JScrollPane(finalStatePanel);
-
-		rightPanel.add(initialStatePanel, BorderLayout.NORTH);
-		rightPanel.add(finalStateScroll, BorderLayout.CENTER);
-
-		btnFAConvert = new JButton("Convert");
-		btnFAConvert.addActionListener(new ConvertAction());
-
-		JPanel alphabetPanel = new JPanel(new BorderLayout());
-		JPanel statePanel = new JPanel(new BorderLayout());
-
-		alphabetPanel.add(lblAlphabet, BorderLayout.NORTH);
-		alphabetPanel.add(txtInputAlphabet, BorderLayout.CENTER);
-
-		statePanel.add(lblStates, BorderLayout.NORTH);
-		statePanel.add(txtStates, BorderLayout.CENTER);
-
-		JScrollPane alphabetScrollPane = new JScrollPane(alphabetPanel);
-		JScrollPane stateScrollPane = new JScrollPane(statePanel);
-
-		leftPanel.add(alphabetScrollPane);
-		leftPanel.add(stateScrollPane);
-
-		stateScrollPane.setPreferredSize(new Dimension(150, 300));
-
-		middlePanel.add(transitionPanel);
-		rightPanel.add(btnFAConvert, BorderLayout.SOUTH);
-
-		topPanel.add(leftPanel, BorderLayout.WEST);
-		topPanel.add(middlePanel, BorderLayout.CENTER);
-		topPanel.add(rightPanel, BorderLayout.EAST);
-
-		JScrollPane topScrollPane = new JScrollPane(topPanel);
-		JScrollPane bottomScrollPane = new JScrollPane(faDiagramFAPanel);
-		
-		// ***************
-		JPanel bottomPanel = new JPanel(new BorderLayout());
-		bottomPanel.add(bottomScrollPane, BorderLayout.CENTER);
-		
-		JPanel buttonPanel = new JPanel(new FlowLayout());
-		
-		JButton btnNext = new JButton("Next");
-		btnNext.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				faDiagramFAPanel.removeState();
-			}
-		});
-		
-		JButton btnBack = new JButton("Back");
-		btnBack.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				faDiagramFAPanel.previousState();
-			}
-		});
-		
-		JLabel lblRegex = new JLabel();
-		
-		JPanel panel = new JPanel(new FlowLayout());
-		panel.add(new JLabel("Regex:"));
-		panel.add(lblRegex);
-		faDiagramFAPanel.setRegexLabel(lblRegex);
-		
-		buttonPanel.add(btnNext);
-		buttonPanel.add(btnBack);
-		
-		bottomPanel.add(buttonPanel, BorderLayout.EAST);
-		
-		bottomPanel.add(panel, BorderLayout.SOUTH);
-		// ***************
-		
-		
-		bottomScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topScrollPane, bottomPanel);
-//		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topScrollPane, bottomScrollPane);
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setMinimumSize(new Dimension(frameWidth, frameHeight));
-
-		faCard.add(splitPane, BorderLayout.CENTER);
-	}
-
 	private void drawTable(JPanel transitionPanel, String txtStates) {
 		DefaultTableModel model = (DefaultTableModel) transitionTable.getModel();
 
@@ -651,10 +680,20 @@ public class Converter {
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == btnRegexConvert) {
 				String regex = txtRegex.getText();
-				faDiagramRegexPanel.convertToFa(regex);
 
-				faDiagramRegexPanel.repaint();
-				regexCard.repaint();
+				if (regex.length() == 0) {
+					String message = "Regex cannot be empty";
+					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+
+					// *********************
+					// faDiagramRegexPanel.repaint();
+					faDiagramRegexPanel.convert(regex);
+					// *********************
+
+					// faDiagramRegexPanel.repaint();
+					regexCard.repaint();
+				}
 			}
 
 			if (e.getSource() == btnFAConvert) {
@@ -694,8 +733,10 @@ public class Converter {
 							if (initial.equals(label)) {
 								initialState = state;
 								state.setInitial(true);
+								states.add(0, state);	// want initial state to be at front 
+							} else {
+								states.add(state);
 							}
-							states.add(state);
 						}
 
 						// transitions
@@ -744,7 +785,8 @@ public class Converter {
 						// inside all of the if statements
 						faToConvert = createFA(initialState, finalStates, states, inputAlphabet);
 						faDiagramFAPanel.setFA(faToConvert);
-						faDiagramFAPanel.repaint();;
+						faDiagramFAPanel.repaint();
+						;
 
 					} else {
 						String message = "Please choose a final state. To select multiple hold the 'command' key";
@@ -808,81 +850,3 @@ public class Converter {
 	}
 
 }
-
-//class RegexConverterPanel extends JPanel {
-//
-//	private Finite_Automata fa = null;
-//	
-//	// ***********
-//	private FA_Drawer drawer;
-//	
-//	public RegexConverterPanel() {
-//		setBackground(Color.white);
-//		setMinimumSize(new Dimension(100, 300));
-//		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-//	}
-//
-//	public void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		drawer = new FA_Drawer(g);
-//		
-////		if (fa != null) {
-////			drawer.drawFA(fa);
-////		}
-//	}
-//
-//	public void convertToFa(String regex) {
-//		
-//		Regex_to_FA converter = new Regex_to_FA();
-//		
-//		
-//
-//		String errorMessage = converter.validate(regex);
-//
-//		if (errorMessage == "") {
-//			Finite_Automata fa = converter.convertToFA(regex);
-//			this.fa = fa;
-//			repaint();
-//		} else {
-//			String message = "Please enter a valid regex. " + errorMessage;
-//			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
-//		}
-//	}
-//
-//}
-
-//class FAConverterPanel extends JPanel {
-//
-////	private String regex = "";
-//	private Finite_Automata fa = null;
-//
-//	public FAConverterPanel() {
-//		setBackground(Color.white);
-//		setMinimumSize(new Dimension(100, 300));
-//		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-//	}
-//
-//	public void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		if (fa != null) {
-//
-//			FA_Drawer drawer = new FA_Drawer(g);
-//			drawer.drawFA(fa);
-//
-//			// TODO
-//			
-//			FA_to_Regex converter = new FA_to_Regex();
-//			String regex = converter.convert(fa);
-//			g.drawString(regex, 50, 50);
-//		}
-//	}
-//
-//	public void convertToRegex(Finite_Automata fa) {
-//		this.fa = fa;
-//
-//		// TODO
-//
-//		repaint();
-//	}
-//
-//}

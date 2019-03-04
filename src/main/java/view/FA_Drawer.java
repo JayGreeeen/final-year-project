@@ -10,33 +10,57 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import toolbox.FA_Dimension;
 import toolbox.Finite_Automata;
 import toolbox.State;
 
 public class FA_Drawer {
 
-	private Graphics g; 
+	private Graphics g;
 	private final int circle_radius = 20;
-	
-	public FA_Drawer(Graphics g){
+
+	private int centrex = 200;
+	private int centrey = 200;
+	private int spacing = 150;
+
+	private FA_Dimension faDimension;
+
+	public FA_Drawer() {
+	}
+
+	public void setGraphics(Graphics g) {
 		this.g = g;
+		// this.g.setFont(new Font("TimesRoman", Font.BOLD, 15));
+	}
+
+	public void setCentre(int xpos, int ypos) {
+//		System.out.println("resetting centre to: " + xpos + ", " + ypos);
+		centrex = xpos;
+		centrey = ypos;
+	}
+
+	public void setSpacing(int spacing) {
+		this.spacing = spacing;
 	}
 
 	public void drawFA(Finite_Automata fa) {
+//		System.out.println("drawing FA with centre: " + centrex + ", " + centrey);
+		faDimension = new FA_Dimension();
+		faDimension.setYPos(centrey);
+
 		ArrayList<State> stateList = fa.getStates();
+		// g.setFont(new Font("TimesRoman", Font.BOLD, 15));
 		Map<State, State_Centre> statePositions = drawStates(g, stateList);
 
 		for (State start : statePositions.keySet()) {
 
 			State_Centre startPos = statePositions.get(start);
-
 			Map<State, ArrayList<String>> transitions = start.getTransitions();
 
 			for (Entry<State, ArrayList<String>> entry : transitions.entrySet()) {
 
 				State end = entry.getKey();
 				State_Centre endPos = statePositions.get(end);
-
 				ArrayList<String> labels = entry.getValue();
 
 				int startIndex = stateList.indexOf(start);
@@ -57,66 +81,8 @@ public class FA_Drawer {
 		}
 	}
 
-	private void drawTransitions(State_Centre start, State_Centre end, ArrayList<String> labels,
-			boolean nextTo, boolean backwardsTransition) {
-		int numLabels = labels.size();
-		int height = 20;
-		int curve = -1;
-
-		if (nextTo) {
-			boolean curveUp = true;
-
-			if (backwardsTransition) {
-				curve = 1;
-				curveUp = false;
-			}
-
-			if (numLabels == 1 && backwardsTransition == false) {
-				drawStraightTransition(g, start, end, labels.get(0));
-			} else {
-				// multiple labels
-				for (int i = 0; i < numLabels; i++) {
-					if (i == 0) {
-						drawSlightCurveTransition(g, start, end, labels.get(i), curveUp);
-					} else {
-
-						drawTransition(g, start, end, curve * height, labels.get(i));
-						height += 30;
-					}
-				}
-			}
-
-		} else {
-			height = 50;
-
-			// find out how far apart they are
-			// use this as a factor for the distance
-
-			int startX = start.getXPos();
-			int endX = end.getXPos();
-			int dist;
-
-			if (backwardsTransition) {
-				curve = 1; // curve down
-				dist = startX - endX;
-			} else {
-				dist = endX - startX;
-			}
-
-			height += ((dist / 100) * 30);
-
-			for (int i = 0; i < numLabels; i++) {
-				drawTransition(g, start, end, curve * height, labels.get(i));
-				height += 40;
-			}
-		}
-	}
-
 	private Map<State, State_Centre> drawStates(Graphics g, ArrayList<State> states) {
 		// where to draw the states
-		int centrex = 200;
-		int centrey = 200;
-		int spacing = 100;
 
 		Map<State, State_Centre> statePositions = new HashMap<State, State_Centre>();
 
@@ -124,6 +90,8 @@ public class FA_Drawer {
 			drawState(g, centrex, centrey, state);
 			statePositions.put(state, new State_Centre(centrex, centrey));
 			centrex = centrex + spacing;
+
+			faDimension.setLength(centrex + circle_radius);
 		}
 		return statePositions;
 	}
@@ -147,9 +115,10 @@ public class FA_Drawer {
 		if (label.length() >= 5) {
 			fontsize = 10;
 
-			xpos = xCentre - 5 * (width / 10);
+			xpos = xCentre - 3 * (width / 10);
 			ypos = yCentre + 3;
 
+			// g.setFont(new Font("TimesRoman", Font.BOLD, fontsize));
 			g.drawOval(xCentre - circle_radius, yCentre - circle_radius, 2 * circle_radius, 2 * circle_radius);
 
 		} else {
@@ -157,6 +126,8 @@ public class FA_Drawer {
 
 			xpos = xCentre - (width / 2);
 			ypos = yCentre + 3;
+
+			// g.setFont(new Font("TimesRoman", Font.BOLD, fontsize));
 			g.drawOval(xCentre - circle_radius, yCentre - circle_radius, 2 * circle_radius, 2 * circle_radius);
 		}
 
@@ -164,6 +135,7 @@ public class FA_Drawer {
 		// g.drawString(label, xCentre - (width/2), yCentre);
 
 		g.setFont(new Font("TimesRoman", Font.PLAIN, fontsize));
+
 		g.drawString(label, xpos, ypos);
 
 		if (state.isFinalState()) {
@@ -195,6 +167,61 @@ public class FA_Drawer {
 		endx = ((int) (Math.sin(angle) * arrowLength)) + (int) startx;
 		endy = ((int) (Math.cos(angle) * arrowLength)) + (int) starty;
 		g.drawLine((int) startx, (int) starty, endx, endy);
+	}
+
+	private void drawTransitions(State_Centre start, State_Centre end, ArrayList<String> labels, boolean nextTo,
+			boolean backwardsTransition) {
+		int numLabels = labels.size();
+		int height = 20;
+		int curve = -1;
+
+		if (nextTo) {
+			boolean curveUp = true;
+
+			if (backwardsTransition) {
+				curve = 1;
+				curveUp = false;
+			}
+
+			if (numLabels == 1 && backwardsTransition == false) {
+				drawStraightTransition(g, start, end, labels.get(0));
+			} else {
+				// multiple labels
+				for (int i = 0; i < numLabels; i++) {
+					if (i == 0) {
+						drawSlightCurveTransition(g, start, end, labels.get(i), curveUp);
+					} else {
+						
+						drawTransition(g, start, end, curve * height, labels.get(i));
+						height += 30;
+					}
+				}
+			}
+
+		} else {
+			height = 40;
+
+			// find out how far apart they are
+			// use this as a factor for the distance
+
+			int startX = start.getXPos();
+			int endX = end.getXPos();
+			int dist;
+
+			if (backwardsTransition) {
+				curve = 1; // curve down
+				dist = startX - endX;
+			} else {
+				dist = endX - startX;
+			}
+
+			height += ((dist / 100) * 30);
+
+			for (int i = 0; i < numLabels; i++) {
+				drawTransition(g, start, end, curve * height, labels.get(i));
+				height += 40;
+			}
+		}
 	}
 
 	private void drawSlightCurveTransition(Graphics g, State_Centre start, State_Centre end, String label,
@@ -278,24 +305,32 @@ public class FA_Drawer {
 		double endy = end.getYPos();
 
 		if (start == end) {
-			startx -= 10;
-			endx += 10;
-			curve = -50;
+			startx -= 15;
+			endx += 15;
+			// curve = -50;
 		}
 
 		if (curve > 0) {
 			// means the curve is going down the page
 			starty += circle_radius + 5;
 			endy += circle_radius + 5;
+
+			int h = (int) ((starty + starty + curve - 5) / 2);
+			faDimension.setBackTransitionHeight(h);
+			
 		} else {
 			starty -= (circle_radius + 5);
 			endy -= (circle_radius + 5);
+
+			int h = (int) ((starty + starty + curve - 5) / 2);
+			faDimension.setTransitionHeight(h);
+
 		}
 
 		double midpoint = (startx + endx) / 2;
 		double controlx = midpoint;
 		double controly = starty + curve;
-
+		
 		Point2D control = new Point2D.Double(controlx, controly);
 		createArrow(g, startx, starty, endx, endy, control, label);
 	}
@@ -307,6 +342,11 @@ public class FA_Drawer {
 		arrow.setCurve(startx, starty, control.getX(), control.getY(), endx, endy);
 
 		Graphics2D g2d = (Graphics2D) g;
+
+		// makes the line thicker
+		// Stroke stroke = new BasicStroke(2f);
+		// g2d.setStroke(stroke);
+
 		g2d.draw(arrow);
 		drawArrow(g2d, endPosArrow, control);
 		drawLabel(g, arrow, label);
@@ -330,9 +370,27 @@ public class FA_Drawer {
 	}
 
 	private void drawLabel(Graphics g, QuadCurve2D arrow, String label) {
+
+		int width = g.getFontMetrics().stringWidth(label);
+
+		// double startx = arrow.getX1();
+		// double endx = arrow.getX2();
+
+		// double length = endx - startx;
+		// if (length > )
+
 		int x = (int) arrow.getCtrlX();
 		int y = (int) (arrow.getY1() + arrow.getCtrlY() - 5) / 2;
-		g.drawString(label, x, (int) y);
+
+		int pos = x - (width / 2);
+
+		g.drawString(label, pos, (int) y);
+		// g.drawString(label, x, (int) y);
+	}
+
+	public FA_Dimension getDimension() {
+		return faDimension;
 	}
 
 }
+

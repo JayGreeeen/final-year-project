@@ -1,4 +1,8 @@
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
 
 import fa_to_regex.FA_to_Regex;
@@ -88,4 +92,5 @@ public class Main {
 		}
 
 	}
+	
 }

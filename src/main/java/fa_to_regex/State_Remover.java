@@ -12,8 +12,6 @@ public class State_Remover {
 
 	// public Finite_Automata remove(State state, Finite_Automata oldfa) {
 	public void removeConnectionsTo(State state, Finite_Automata oldfa) {
-		System.out.println("Removing state " + state.getLabel());
-
 		ArrayList<State> states = oldfa.getStates();
 
 		// states which point to this state
@@ -44,7 +42,7 @@ public class State_Remover {
 
 			for (State endState : endStates) {
 
-				System.out.println("\tcreating transition from " + startState + " to " + endState);
+//				System.out.println("\tcreating transition from " + startState + " to " + endState);
 
 				String label = createUnionLabel(startState.getTransitionsTo(state));
 				// System.out.println("Label, " + startState + " to " + state +
@@ -57,8 +55,8 @@ public class State_Remover {
 
 				label += createUnionLabel(state.getTransitionsTo(endState));
 				startState.addTransition(endState, label);
-				System.out.println(
-						"\tAdding transition from " + startState + " to " + endState + " with label: " + label);
+//				System.out.println(
+//						"\tAdding transition from " + startState + " to " + endState + " with label: " + label);
 
 			}
 		}
@@ -148,6 +146,35 @@ public class State_Remover {
 		}
 		
 		return label;
+	}
+	
+	public Finite_Automata splitUpInitialAndFinalStates(Finite_Automata fa){
+		// for the case when the final and initial stateds are the same
+		
+		State initial = fa.getInitialState();
+		initial.setFinal(false);
+		
+		State finalState = new State("end");
+		finalState.setFinal(true);
+		
+		ArrayList<String> transitions = initial.getTransitionsTo(initial);
+		initial.removeTransitionTo(initial);
+		for (String t : transitions){
+			initial.addTransition(finalState, t);
+		}
+		
+		ArrayList<State> finalStates = new ArrayList<>();
+		finalStates.add(finalState);
+		
+		ArrayList<State> states = new ArrayList<>();
+		states.add(initial);
+		states.add(finalState);
+		
+		ArrayList<String> inputAlphabet = new ArrayList<>();
+		inputAlphabet.addAll(fa.getInputAlphabet());
+		
+		return new Finite_Automata(initial, finalStates, states, inputAlphabet);
+		
 	}
 
 }

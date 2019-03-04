@@ -6,80 +6,126 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
+import model.Regex_Converter_Panel;
 import toolbox.Finite_Automata;
 import toolbox.Tree_Node;
 import toolbox.Tree_Node.ConcatNode;
 import toolbox.Tree_Node.LeafNode;
 import toolbox.Tree_Node.StarNode;
 import toolbox.Tree_Node.UnionNode;
-import view.FA_Drawer;
 
 public class Regex_to_FA {
 
 	private Map<Integer, Integer> bracketMap = new HashMap<Integer, Integer>();
 	private char[] chars;
 	
-	//****** 
-//	private FA_Drawer drawer;
+	private Regex_Converter_Panel converter;
+	
+	public Regex_to_FA(Regex_Converter_Panel converter){
+		this.converter = converter;
+	}
 	
 	// take in a regex and turn it into a FA
-	public Finite_Automata convertToFA(String regex) {
-		regex = regex.replace(" ", "");
-		System.out.println("Regex - " + regex);
-		// chars = regex.toCharArray();
-
-		// boolean valid = validate(regex);
-		// if (valid == false) {
-		// System.out.println("Regex not valid");
-		// } else {
-		// System.out.println("building tree");
-		
-		Tree_Node root = (new Tree_Builder(regex)).buildTree();
-		Finite_Automata FA = generateFA(root);
-		return FA;
-
-		// }
-		// return null;
+//	public Finite_Automata convertToFA(String regex) {
+//		regex = regex.replace(" ", "");
+//		System.out.println("Regex - " + regex);
+//		// chars = regex.toCharArray();
+//
+//		// boolean valid = validate(regex);
+//		// if (valid == false) {
+//		// System.out.println("Regex not valid");
+//		// } else {
+//		// System.out.println("building tree");
+//		
+//		Tree_Node root = (new Tree_Builder(regex)).buildTree();
+//		Finite_Automata FA = generateFA(root);
+//		return FA;
+//
+//		// }
+//		// return null;
+//	}
+	
+	public Tree_Node convertToTree(String regex){
+		return (new Tree_Builder(regex)).buildTree();
 	}
 
-	private Finite_Automata generateFA(Tree_Node node) {
+	public Finite_Automata generateFA(Tree_Node node) {
 
 		// take in the root of the tree and generate the FA
 		Automaton_Builder builder = new Automaton_Builder();
 
 		if (node instanceof LeafNode) {
+//			Finite_Automata leftFA = builder.buildSimpleAutomaton((LeafNode) node);
+//			converter.setLeftFA(leftFA);
+//			return leftFA;
 			return builder.buildSimpleAutomaton((LeafNode) node);
 			
 		} else {
 			// not a leaf node
 
 			if (node.getLeftChild() != null) {
-				// System.out.println("\tGenerating FA for left child");
+//				 System.out.println("\tGenerating FA for left child - " + node.getLeftChild().getText());
 				Finite_Automata leftFA = generateFA(node.getLeftChild());
 				// System.out.println("Left child: " + leftFA);
+				
+				
+//				converter.setLeftFA(leftFA);
+				// ******************
+				// draw the left child
 
 				if (node instanceof StarNode) {
-					// System.out.println("Adding star operator to left child");
-					return builder.addStarOperator(leftFA);
+//					 System.out.println("Adding star operator to left child");
+					
+					
+					// ***********
+					// combining left child with char operator 
+					// draw out the left child and right child which are being combined
+					
+					Finite_Automata fa = builder.addStarOperator(leftFA);
+					
+//					converter.setRightFA(null);
+//					converter.setCombinedFA(fa);
+					
+					return fa;
+					
+					// ******************
+					// draw the combined fa
+					
 				} else {
 
 					if (node.getRightChild() != null) {
-						// System.out.println("\tGenerating FA for right
-						// child");
+//						 System.out.println("\tGenerating FA for right child - " + node.getRightChild().getText());
 						Finite_Automata rightFA = generateFA(node.getRightChild());
 						// System.out.println("Right child: " + rightFA);
+						
+						// ******************
+						// draw the right child
+//						converter.setRightFA(rightFA);
 
 						if (node instanceof UnionNode) {
 							// use rule 3 to connect child NFAs
-							// System.out.println("\tCombining child nodes with
-							// |");
-							return builder.combineWithUnion(leftFA, rightFA);
+//							 System.out.println("\tCombining child nodes with |");
+							
+							Finite_Automata fa = builder.combineWithUnion(leftFA, rightFA);
+							
+//							converter.setCombinedFA(fa);
+							
+							return fa;
+							
+							// ******************
+							// draw the combined fa
 
 						} else if (node instanceof ConcatNode) {
 							// use rule 4 to connect child NFAs
-							// System.out.println("\tCombining child nodes with
-							// •");
-							return builder.combineWithConcat(leftFA, rightFA);
+//							 System.out.println("\tCombining child nodes with •");
+							Finite_Automata fa = builder.combineWithConcat(leftFA, rightFA);
+							
+//							converter.setCombinedFA(fa);
+							
+							return fa;
+							// ******************
+							// draw the combined fa
+							
 						}
 					} else {
 						// no right child - should never be the case

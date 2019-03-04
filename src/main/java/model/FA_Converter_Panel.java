@@ -6,11 +6,13 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import fa_to_regex.FA_to_Regex;
 import fa_to_regex.State_Remover;
+import toolbox.FA_Dimension;
 import toolbox.Finite_Automata;
 import toolbox.State;
 import view.FA_Drawer;
@@ -26,10 +28,20 @@ public class FA_Converter_Panel extends JPanel {
 
 	private FA_to_Regex converter;
 	private State_Remover remover;
+	private FA_Drawer drawer;
 
 	private JLabel lblRegex;
-	
+	private JButton btnNext;
+	private JButton btnBack;
+
+	private int centre = 200;
+	private int spacing = 150;
+
+	private int frameWidth = 100;
+	private int frameHeight = 300;
+
 	boolean backPressed = false;
+	boolean redraw = false;
 
 	public FA_Converter_Panel() {
 		setBackground(Color.white);
@@ -38,9 +50,7 @@ public class FA_Converter_Panel extends JPanel {
 
 		converter = new FA_to_Regex();
 		remover = new State_Remover();
-		
-		JLabel label = new JLabel("Regex: ");
-		
+		drawer = new FA_Drawer();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -48,22 +58,56 @@ public class FA_Converter_Panel extends JPanel {
 		super.paintComponent(g);
 
 		if (fa != null) {
-			FA_Drawer drawer = new FA_Drawer(g);
+			drawer.setGraphics(g);
+			// drawer.setCentre(100, 200);
+
+			drawer.setCentre(centre, centre);
+
+			// if goes off the page - redraw and resize the page
+			// int
 
 			if (backPressed == true) {
 				drawer.drawFA(prevFA);
 				backPressed = false;
-				System.out.println("drawing previous FA: " + prevFA);
+				// System.out.println("drawing previous FA: " + prevFA);
 			} else {
 				drawer.drawFA(fa);
 				// prevFA = fa;
 			}
 
-			// TODO
+			FA_Dimension dimension = drawer.getDimension();
 
-			// String regex = converter.convert(fa);
-			// g.drawString(regex, 50, 50);
+			int highestPoint = dimension.getTransitionHeight();
+			int lowestPoint = dimension.getBackTransitionHeight();
+			int length = dimension.getLength();
+
+			if (highestPoint < 0) {
+				redraw = true;
+				int distance = 0 - highestPoint;
+				int spacing = 20;
+
+				centre += distance + spacing;
+			}
+
+			if (lowestPoint >= frameHeight) {
+				setFrameSize(frameWidth, lowestPoint + 200);
+			}
+
+			if (length >= frameWidth) {
+				setFrameSize(length + 200, frameHeight);
+			}
 		}
+
+		if (redraw == true) {
+			redraw = false;
+			repaint();
+		}
+	}
+
+	private void setFrameSize(int width, int height) {
+		this.setPreferredSize(new Dimension(width, height));
+		frameWidth = width;
+		frameHeight = height;
 	}
 
 	public void setFA(Finite_Automata fa) {
@@ -72,14 +116,26 @@ public class FA_Converter_Panel extends JPanel {
 		}
 		this.fa = fa;
 
+		centre = 200;
+		spacing = 150;
+
+		drawer.setCentre(centre, centre);
+		drawer.setSpacing(spacing);
+
+		btnNext.setEnabled(true);
+
 		repaint();
 	}
 
 	public void removeState() {
+		setFrameSize(100, 300);
 		prevFA = fa.copy();
+		spacing = spacing + 50;
+		drawer.setSpacing(spacing);
+		centre = 200;
 
 		if (fa.getFinalStates().size() > 1) {
-			fa = converter.reduceFinalStateCount(fa);
+			fa = converter.createNewFinalState(fa);
 		} else {
 			ArrayList<State> states = converter.getStatesToRemove(fa);
 
@@ -88,15 +144,36 @@ public class FA_Converter_Panel extends JPanel {
 				remover.removeConnectionsTo(state, fa);
 
 			} else {
-				cleanUpInitialAndFinalStates();
+
+				// *************
+				// TODO
+				if (fa.getFinalStates().size() == 0) {
+					// there are no final states
+					// regex is empty - nothing is accepted
+
+					// this shouldnt be the case - the front end prevents this
+					// but might be needed
+				}
+
+				State initial = fa.getInitialState();
+
+				if (initial.isFinalState() == true) {
+					fa = remover.splitUpInitialAndFinalStates(fa);
+				} else {
+					cleanUpInitialAndFinalStates();
+				}
 			}
 		}
+
+		btnBack.setEnabled(true);
 		repaint();
 	}
 
 	public void previousState() {
 		backPressed = true;
 		fa = prevFA;
+		btnBack.setEnabled(false);
+		btnNext.setEnabled(true);
 		repaint();
 	}
 
@@ -183,11 +260,18 @@ public class FA_Converter_Panel extends JPanel {
 							finalState.removeTransitionTo(initialState);
 							initialState.removeTransitionTo(finalState);
 							initialState.addTransition(finalState, label);
-						} else {
-							
-							// only initial -> final 
+							// } else {
+
+							// only initial -> final
 							String regex = initialState.getTransitionsTo(finalState).get(0);
 							lblRegex.setText(regex);
+							btnNext.setEnabled(false);
+
+							int width = lblRegex.getText().length();
+							if (width >= 60) {
+								spacing += 200;
+								drawer.setSpacing(spacing);
+							}
 						}
 					}
 				}
@@ -195,14 +279,20 @@ public class FA_Converter_Panel extends JPanel {
 		}
 	}
 
-
-	public void setRegexLabel(JLabel label){
+	public void setRegexLabel(JLabel label) {
 		this.lblRegex = label;
 	}
-	
-	public void resetRegexLabelText(){
+
+	public void resetRegexLabelText() {
 		lblRegex.setText("");
 	}
-	
-}
 
+	public void setNextButton(JButton next) {
+		this.btnNext = next;
+	}
+
+	public void setBackButton(JButton back) {
+		this.btnBack = back;
+	}
+
+}

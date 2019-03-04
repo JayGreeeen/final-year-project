@@ -339,7 +339,7 @@ public class Tree_Builder_Test {
 
 		builder = new Tree_Builder(regex);
 		Tree_Node root = builder.buildTree();
-		Print_Tree.print(root); 
+		Print_Tree.printSideways(root); 
 
 		String label1 = "a";
 		String label2 = "b";

@@ -35,12 +35,14 @@ public class ReadWriteUtility {
 	}
 
 	private File createRegexFolder() {
-		File dir = new File(workingDir + targetFolder, "Saved Regex's");
+		File dir = new File(workingDir + targetFolder, "Saved Regexs");
 		dir.mkdir();
 		return dir;
 	}
 
 	public void writeToFile(Finite_Automata fa, String filename) {
+		String[] options = { "New name", "Replace file" };
+
 		String faString = gson.toJson(fa);
 
 		File folder = createFAFolder();
@@ -48,9 +50,20 @@ public class ReadWriteUtility {
 		boolean check = checkName(folder, filename);
 
 		while (check) {
-			filename = JOptionPane.showInputDialog(frame,
-					"File '" + filename + "' already exists. Enter a different name for the file:", "Saving..",
-					JOptionPane.WARNING_MESSAGE);
+
+			int result = JOptionPane.showOptionDialog(null,
+					"File '" + filename + "' already exists. Replace the file, or enter a different name:", "Saving...",
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, null);
+
+			if (result == JOptionPane.YES_OPTION) {
+				filename = JOptionPane.showInputDialog("Enter a new name for the file:");
+			} else {
+
+				if (checkName(folder, filename)) {
+					File file = new File(folder, filename + ".txt");
+					file.delete();
+				}
+			}
 
 			check = checkName(folder, filename);
 		}
@@ -68,14 +81,25 @@ public class ReadWriteUtility {
 	}
 
 	public void writeToFile(String regex, String filename) {
+		String[] options = { "New name", "Replace file" };
+		
 		File folder = createRegexFolder();
-
 		boolean check = checkName(folder, filename);
 
 		while (check) {
-			filename = JOptionPane.showInputDialog(frame,
-					"File '" + filename + "' already exists. Enter a different name for the file:", "Saving..",
-					JOptionPane.WARNING_MESSAGE);
+			int result = JOptionPane.showOptionDialog(null,
+					"File '" + filename + "' already exists. Replace the file, or enter a different name:", "Saving...",
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, null);
+
+			if (result == JOptionPane.YES_OPTION) {
+				filename = JOptionPane.showInputDialog("Enter a new name for the file:");
+			} else {
+
+				if (checkName(folder, filename)) {
+					File file = new File(folder, filename + ".txt");
+					file.delete();
+				}
+			}
 
 			check = checkName(folder, filename);
 		}
@@ -142,7 +166,7 @@ public class ReadWriteUtility {
 					line = buf.readLine();
 				}
 				buf.close();
-				
+
 				return sb.toString();
 
 			} catch (IOException e) {

@@ -40,8 +40,9 @@ public class Regex_to_FA_Test {
 		String regex = "a";
 		
 		// *********
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automata actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
 
 		State actualInitial = actualFA.getInitialState();
 		State actualFinal = actualFA.getFinalStates().get(0);
@@ -72,8 +73,9 @@ public class Regex_to_FA_Test {
 		inputAlphabet.add(label2);
 
 		String regex = "ab";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automata actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
 
 		State actualInitial = actualFA.getInitialState();
 		State actualFinal = actualFA.getFinalStates().get(0);
@@ -115,9 +117,10 @@ public class Regex_to_FA_Test {
 		int numStates = 6;
 
 		String regex = "a|b";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
-
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automata actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
+		
 		System.out.println(actualFA);
 
 		State actualInitial = actualFA.getInitialState();
@@ -159,9 +162,10 @@ public class Regex_to_FA_Test {
 		inputAlphabet.add(label1);
 
 		String regex = "a*";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
-
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automata actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
+		
 		System.out.println(actualFA);
 
 		State actualInitial = actualFA.getInitialState();
