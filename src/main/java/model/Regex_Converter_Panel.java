@@ -287,7 +287,7 @@ public class Regex_Converter_Panel extends JPanel {
 	}
 
 	private void redraw() {
-		System.out.println("redrawing. map size: " + faMap.size());
+//		System.out.println("redrawing. map size: " + faMap.size());
 		Finite_Automata fa;
 		Integer[] values;
 

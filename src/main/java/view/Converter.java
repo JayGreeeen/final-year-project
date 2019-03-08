@@ -86,6 +86,8 @@ public class Converter {
 	private JComboBox<String> initialStateCombo;
 	private JList<String> finalStateList;
 	private Finite_Automata faToConvert = null;
+	
+	private HelpFrame helpFrame;
 
 	public static void main(String[] args) {
 		createAndShowGUI();
@@ -165,7 +167,13 @@ public class Converter {
 		save.addActionListener(new SaveListener(tabbedPane));
 
 		JMenuItem help = new JMenuItem("Help");
-		help.addActionListener(new HelpListener(tabbedPane));
+		help.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				helpFrame = new HelpFrame();
+			}
+		});
 		
 		file.add(open);
 		file.add(save);
@@ -173,150 +181,6 @@ public class Converter {
 		menu.add(help);
 
 		pane.add(menu, BorderLayout.NORTH);
-	}
-
-	class HelpListener implements ActionListener {
-
-		private JTabbedPane pane;
-		private JFrame helpFrame;
-
-		public HelpListener(JTabbedPane pane) {
-			this.pane = pane;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			int index = pane.getSelectedIndex();
-			Component tab = pane.getComponent(index);
-			String name = tab.getName();
-
-			helpFrame = new JFrame("Help");
-			helpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			helpFrame.pack();
-
-			int width = 800;
-			int height = 500;
-
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			int screenWidth = screenSize.width;
-			int screenHeight = screenSize.height;
-			int xpos = (screenWidth / 2) - (width / 2);
-			int ypos = (screenHeight / 2) - (height / 2);
-
-			helpFrame.setBounds(xpos, ypos, width, height);
-			helpFrame.setLayout(new BorderLayout());
-
-			JPanel p = new JPanel(new BorderLayout());
-
-			helpFrame.add(p, BorderLayout.CENTER);
-
-			// helpFrame.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-			JEditorPane editorPane = new JEditorPane();
-			editorPane.setEditable(false);
-			editorPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-			JLabel label = new JLabel();
-			label.setBorder(new EmptyBorder(10, 10, 10, 10));
-			helpFrame.add(label, BorderLayout.NORTH);
-
-			if (name == "RegexToFA") {
-				// helpFrame.add(new JLabel("Help for regex conversion"),
-				// BorderLayout.NORTH);
-
-				label.setText("Regex to FA conversion");
-
-				String regexHelp = "Enter a valid regex into the text box and press the convert button to see the steps"
-						+ " of the conversion to a finite automaton" + "\n\nRules for valid regular expressions\n\n"
-						+ "- Must have matching brackets\n" + "\t Valid examples: " + "\n\t\t- (a), "
-						+ "\n\t\t- (ab)*, " + "\n\t\t- (a|b)cd\n\n"
-
-						+ "- Union | must be preceded, and followed by valid regular expressions\n"
-						+ "\t Valid examples: " + "\n\t\t- abc|def, " + "\n\t\t- a*|b*, " + "\n\t\t- (abc)*|(cd)*e\n\n"
-
-						+ "- Kleene star * can only follow a valid regex\n" + "\t Valid examples: " + "\n\t\t- a*, "
-						+ "\n\t\t- abc*, " + "\n\t\t- a(b*), " + "\n\t\t- a|b*"
-
-						+ " ";
-				editorPane.setText(regexHelp);
-
-				p.add(editorPane, BorderLayout.CENTER);
-				// helpFrame.setTitle("Regex conversion help");
-				// TODO
-				// describe the regex conversion
-				// have the rules of what regex is acceptable
-				// describe hwo the steps are displayed
-				// can press the back button to look at the previous step
-
-				helpFrame.setVisible(true);
-			} else {
-				// FAToRegex
-
-				// helpFrame.add(new JLabel("Help for fa conversion"),
-				// BorderLayout.NORTH);
-				label.setText("FA conversion help");
-
-				// JPanel panel = new JPanel(new GridLayout(4, 0));
-				//
-				// panel.add(label);
-				//
-				// JEditorPane inputAlphabetPane = new JEditorPane();
-				// inputAlphabetPane.setEditable(false);
-				// inputAlphabetPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-				//
-				//
-				// String help = "To build an automaton fill in the input boxes
-				// on the top half of the screen and then press"
-				// + "the convert button.\n"
-				// + "";
-				//
-				// inputAlphabetPane.setText(help);
-				//
-				// panel.add(inputAlphabetPane);
-
-				String faHelp = "First build an automaton using the input boxes on the top half of the screen. "
-						+ "All boxes require input\n\n"
-						+ "The input alphabet is the list of characters which are used for transitions. "
-						+ "Separate the chars with a newline."
-						+ "The state list should contain all states in the FA, with each state appearing on a newline. "
-						+ "Short state names are preferred, e.g. 1, or s1, instead of state1\n"
-						+ "\nWhen you enter input into the input alphabet and state boxes the transition table will be updated. "
-						+ "The table allows you to specify the state, or set of states separated by a comma which are reachable"
-						+ " from other states. "
-						+ "The rows represent the state the transition leaves from, and the column indicates"
-						+ " the transition label which is used. \nThe last column of the table is the empty jump label. "
-						+ "This is used for non-deterministic finite automata. "
-						+ "\nThe cells of the table can be left blank if you choose it - this would indicate no transitions "
-						+ "from a state. At any point the table can be reset by clicking the 'clear table' button. "
-						+ "\n\nA drop down box in the top right indicates the initial state of the FA. "
-						+ "\nThe final state is chosen by selecting a state from the list. Multiple states can be chosen "
-						+ "by holding down the command button and selecting on multiple states. "
-						+ "\n\nWhen you are ready, click the 'convert' button to display the FA. "
-						+ "\n\nThe 'next' button will show the process of removing the states of the FA to build the FA. \n"
-						+ "The 'back' button will show the previous step. "
-						+ "\n\nWhen the removal process is complete, there should be an FA consisting of 2 states with a single"
-						+ " transition. The label on the transition indicates the regular expression. This will also be displayed "
-						+ "at the bottom of the page";
-
-				editorPane.setText(faHelp);
-
-				p.add(editorPane, BorderLayout.CENTER);
-				// helpFrame.add(panel);
-
-				// TODO
-				// describe the FA conversion
-				// describe all the inputs
-				// - must choose a final state
-				// describe transition table - input the states (or set of
-				// states) which are reachbale with this input
-				// to add empty jumps - use the final column, otherwise blank
-				// final regex displayed at the bottom of the frame
-
-				helpFrame.setVisible(true);
-			}
-
-		}
-
 	}
 
 	private void setUpRegexPanel() {
