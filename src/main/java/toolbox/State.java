@@ -43,7 +43,6 @@ public class State {
 		
 		
 		ArrayList<String> transitionList = new ArrayList<String>();
-//		transitionList.add("-");
 		return transitionList;
 	}
 

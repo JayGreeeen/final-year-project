@@ -97,16 +97,9 @@ public class FA_Drawer {
 	}
 
 	private void drawState(Graphics g, int xCentre, int yCentre, State state) {
-		// TODO
-		// check the length of the string - depending on the length, changes the
-		// width of the circle
-		// the wider it gets, we would want it to be slightly higher as well
-		// ***************************
-
 		String label = state.getLabel();
 
 		int width = g.getFontMetrics().stringWidth(label);
-		// System.out.println(width);
 
 		int fontsize;
 		int xpos;
@@ -118,7 +111,6 @@ public class FA_Drawer {
 			xpos = xCentre - 3 * (width / 10);
 			ypos = yCentre + 3;
 
-			// g.setFont(new Font("TimesRoman", Font.BOLD, fontsize));
 			g.drawOval(xCentre - circle_radius, yCentre - circle_radius, 2 * circle_radius, 2 * circle_radius);
 
 		} else {
@@ -127,12 +119,8 @@ public class FA_Drawer {
 			xpos = xCentre - (width / 2);
 			ypos = yCentre + 3;
 
-			// g.setFont(new Font("TimesRoman", Font.BOLD, fontsize));
 			g.drawOval(xCentre - circle_radius, yCentre - circle_radius, 2 * circle_radius, 2 * circle_radius);
 		}
-
-		// g.drawString("•", xCentre, yCentre);
-		// g.drawString(label, xCentre - (width/2), yCentre);
 
 		g.setFont(new Font("TimesRoman", Font.PLAIN, fontsize));
 

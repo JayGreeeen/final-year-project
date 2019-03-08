@@ -26,7 +26,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,10 +42,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.DefaultTableModel;
 
 import model.FA_Converter_Panel;
@@ -63,8 +58,6 @@ public class Converter {
 
 	private static int frameWidth;
 	private static int frameHeight;
-	// final static int frameWidth = 1000;
-	// final static int frameHeight = 800;
 
 	private static JFrame frame;
 	private JPanel regexCard;
@@ -87,8 +80,6 @@ public class Converter {
 	private JList<String> finalStateList;
 	private Finite_Automata faToConvert = null;
 	
-	private HelpFrame helpFrame;
-
 	public static void main(String[] args) {
 		createAndShowGUI();
 	}
@@ -99,7 +90,7 @@ public class Converter {
 		frame = new JFrame("Converter");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		rwu = new ReadWriteUtility(frame);
+		rwu = new ReadWriteUtility();
 
 		// Create and set up the content pane.
 		Converter converter = new Converter();
@@ -154,12 +145,6 @@ public class Converter {
 				.getScaledInstance(15, 15, Image.SCALE_DEFAULT));
 		ImageIcon openIcon = new ImageIcon(new ImageIcon("src/resources/images/open_green.png").getImage()
 				.getScaledInstance(15, 15, Image.SCALE_DEFAULT));
-		// ImageIcon saveIcon = new ImageIcon(new
-		// ImageIcon("src/resources/images/save1.png").getImage()
-		// .getScaledInstance(15, 15, Image.SCALE_DEFAULT));
-		// ImageIcon openIcon = new ImageIcon(new
-		// ImageIcon("src/resources/images/open1.png").getImage()
-		// .getScaledInstance(15, 15, Image.SCALE_DEFAULT));
 
 		JMenuItem open = new JMenuItem("Open", openIcon);
 		open.addActionListener(new OpenListener(tabbedPane));
@@ -171,7 +156,7 @@ public class Converter {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				helpFrame = new HelpFrame();
+				new HelpFrame();
 			}
 		});
 		
@@ -872,38 +857,6 @@ public class Converter {
 										}
 									}
 
-									// handles the case when the column headers
-									// are states
-									// for (String label : transition) {
-									// label = label.trim();
-									//
-									// if (!label.equals("")) {
-									// if (inputAlphabet.contains(label)) {
-									// String stateLabel =
-									// transitionTable.getValueAt(i,
-									// 0).toString();
-									// // gets row title
-									// String state2Label =
-									// transitionTable.getColumnName(j);
-									// // gets col title
-									// State from = getState(stateLabel,
-									// states);
-									// State to = getState(state2Label, states);
-									//
-									// if (from != null && to != null) {
-									// from.addTransition(to, label);
-									// }
-									//
-									// } else {
-									// String message = "Transition label " +
-									// label
-									// + " is not part of the input language.";
-									// throwError(message);
-									// return;
-									//
-									// }
-									// }
-									// }
 								}
 							}
 						}
@@ -911,7 +864,6 @@ public class Converter {
 						// inside all of the if statements
 						faToConvert = createFA(initialState, finalStates, states, inputAlphabet);
 						faDiagramFAPanel.convert(faToConvert);
-//						faDiagramFAPanel.repaint();
 
 					} else {
 						String message = "Please choose a final state. To select multiple hold the 'command' key";

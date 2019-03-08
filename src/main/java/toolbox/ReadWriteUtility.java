@@ -1,6 +1,5 @@
 package toolbox;
 
-import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,13 +19,8 @@ import com.google.gson.stream.JsonReader;
 public class ReadWriteUtility {
 	private String targetFolder = "/target";
 	private String workingDir = System.getProperty("user.dir");
-	private Frame frame;
 
 	private Gson gson = new Gson();
-
-	public ReadWriteUtility(Frame frame) {
-		this.frame = frame;
-	}
 
 	private File createFAFolder() {
 		File dir = new File(workingDir + targetFolder, "Saved FAs");

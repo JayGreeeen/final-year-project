@@ -13,9 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import fa_to_regex.FA_to_Regex;
 import fa_to_regex.State_Remover;
 import toolbox.FA_Dimension;
