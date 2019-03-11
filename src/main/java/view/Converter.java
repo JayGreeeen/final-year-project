@@ -6,6 +6,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -21,6 +23,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -263,7 +267,7 @@ public class Converter {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				drawTable(transitionPanel, txtStates.getText(), txtInputAlphabet.getText());
-				faDiagramFAPanel.resetRegexLabelText();
+//				faDiagramFAPanel.resetRegexLabelText();
 			}
 		});
 		transitionPanel.add(clear, BorderLayout.SOUTH);
@@ -392,15 +396,18 @@ public class Converter {
 		JPanel bottomPanel = new JPanel(new BorderLayout());
 		bottomPanel.add(bottomScrollPane, BorderLayout.CENTER);
 
-		JPanel buttonPanel = new JPanel(new FlowLayout());
+		
+		// *************
+		JPanel buttonPanel = new JPanel(new BorderLayout());
+//		JPanel buttonPanel = new JPanel(new FlowLayout());
+		
+		
 
 		JButton btnNext = new JButton("Next");
 
-		// *************
 		btnNext.setBackground(new Color(0, 153, 153));
 		btnNext.setBorder(BorderFactory.createRaisedBevelBorder());
 		btnNext.setOpaque(true);
-		btnNext.setPreferredSize(new Dimension(70, 20));
 
 		btnNext.addActionListener(new ActionListener() {
 
@@ -410,21 +417,34 @@ public class Converter {
 			}
 		});
 
-//		JButton btnBack = new JButton("Back");
-		// *************
-//		btnBack.setBackground(new Color(0, 153, 153));
-//		btnBack.setBorder(BorderFactory.createRaisedBevelBorder());
-//		btnBack.setOpaque(true);
-//		btnBack.setPreferredSize(new Dimension(70, 20));
-//
-//		btnBack.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				faDiagramFAPanel.previousState();
-//			}
-//		});
-
+		
+		JLabel lblDone = new JLabel();
+		faDiagramFAPanel.setDoneLabel(lblDone);
+		
+		buttonPanel.add(btnNext, BorderLayout.NORTH);
+		
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
+//		p.add(Box.createRigidArea(new Dimension(5,0)));
+		
+		p.add(btnNext);
+		btnNext.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnNext.setMaximumSize(new Dimension(70, 20));
+		btnNext.setPreferredSize(new Dimension(70, 20));
+		btnNext.setMinimumSize(new Dimension(70, 20));
+//		btnNext.setPreferredSize(new Dimension(70, 20));
+		p.add(lblDone);
+		lblDone.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		buttonPanel.add(p, BorderLayout.NORTH);
+		
+//		buttonPanel.add(lblDone);
+		
+		
+		
+		
+		
+		
 		JLabel lblRegex = new JLabel();
 
 		JPanel panel = new JPanel(new FlowLayout());
@@ -432,7 +452,8 @@ public class Converter {
 		panel.add(lblRegex);
 		faDiagramFAPanel.setRegexLabel(lblRegex);
 
-		buttonPanel.add(btnNext);
+		
+		
 //		buttonPanel.add(btnBack);
 		faDiagramFAPanel.setNextButton(btnNext);
 //		faDiagramFAPanel.setBackButton(btnBack);
@@ -451,6 +472,8 @@ public class Converter {
 
 		faCard.add(splitPane, BorderLayout.CENTER);
 	}
+	
+	
 
 	class OpenListener implements ActionListener {
 

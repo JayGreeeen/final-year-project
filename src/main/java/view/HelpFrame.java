@@ -84,9 +84,9 @@ public class HelpFrame {
 		
 		String text = "This tool demonstrates the steps for conversion between regular expressions"
 				+ " and finite automata.\n\n"
-				+ "The 'RegexToFa' page shows the steps of building a finite automata for a regex input\n"
-				+ "The 'FaToRegex' page demonstrates the state elimination method to obtain the equivalent "
-				+ "regular\nexpression\n";
+				+ "The 'Convert Regex to FA' page shows the steps of building a finite automata for a regex input\n"
+				+ "The 'Convert FA to Regex' page demonstrates the state elimination method to obtain the equivalent\n"
+				+ "regular expression.\n";
 		
 		
 		upperEditorPane.setText(text);

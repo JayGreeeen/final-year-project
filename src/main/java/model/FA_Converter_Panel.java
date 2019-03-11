@@ -33,6 +33,7 @@ public class FA_Converter_Panel extends JPanel {
 	private FA_Drawer drawer;
 
 	private JLabel lblRegex;
+	private JLabel lblDone;
 	private JButton btnNext;
 
 	private int centrex = 200;
@@ -66,14 +67,14 @@ public class FA_Converter_Panel extends JPanel {
 
 		if (fa != null) {
 			redraw();
-			if (addedToMap == false){
+			if (addedToMap == false) {
 				paintFA(fa);
 			}
 		}
 	}
 
 	private void paintFA(Finite_Automata fa) {
-//		System.out.println("painting FA: " + centrex + ", " + centrey);
+		// System.out.println("painting FA: " + centrex + ", " + centrey);
 		drawer.setCentre(centrex, centrey);
 		drawer.drawFA(fa);
 
@@ -82,33 +83,36 @@ public class FA_Converter_Panel extends JPanel {
 		int forwardArrowHeight = dimension.getTransitionHeight();
 		int backArrowHeight = dimension.getBackTransitionHeight();
 		int length = dimension.getLength();
-		
-//		System.out.println("forward arrow height: " + forwardArrowHeight + ". Back arrow height: " + backArrowHeight);
 
-		if (forwardArrowHeight < 0) {
-//			System.out.println("goes off the page");
+		// System.out.println("forward arrow height: " + forwardArrowHeight + ".
+		// Back arrow height: " + backArrowHeight);
+
+		if (forwardArrowHeight <= 10) {
+//			 System.out.println("goes off the page");
 			// goes off the page
 			centrey += (0 - forwardArrowHeight) + 50;
 			backArrowHeight += (0 - forwardArrowHeight) + 50;
 		}
 
 		if (length >= frameWidth) {
-//			System.out.println("wider than the page - length: " + length + " > " + frameWidth);
+			// System.out.println("wider than the page - length: " + length + "
+			// > " + frameWidth);
 			setFrameSize(length + 200, frameHeight);
 		}
 
 		if (backArrowHeight >= frameHeight - 100) {
-//			System.out.println("lowest point, goes off the page: " + backArrowHeight);
+			// System.out.println("lowest point, goes off the page: " +
+			// backArrowHeight);
 			// System.out.println("longer than the page");
 			setFrameSize(frameWidth, backArrowHeight + 200);
 		}
-		
-//		System.out.println("\tCurrent lowest point: " + currentLowestPoint);
-		
-		if (currentLowestPoint != 0 && forwardArrowHeight < currentLowestPoint) {
-//			System.out.println("moving down");
+
+//		 System.out.println("\tCurrent lowest point: " + currentLowestPoint + ". forward height: " + forwardArrowHeight);
+
+		if (currentLowestPoint != 0 && forwardArrowHeight <= currentLowestPoint) {
+			// System.out.println("moving down");
 			int difference;
-			if (forwardArrowHeight < 0){
+			if (forwardArrowHeight < 0) {
 				difference = currentLowestPoint - (0 - forwardArrowHeight);
 			} else {
 				difference = currentLowestPoint - forwardArrowHeight;
@@ -120,21 +124,24 @@ public class FA_Converter_Panel extends JPanel {
 			if (addedToMap == false) {
 				Integer[] values = { centrex, centrey, spacing };
 				faMap.put(fa.copy(), values);
-//				System.out.println("\tadding to FA map");
+				// System.out.println("\tadding to FA map");
 			}
 		} else {
 			Integer[] values = { centrex, centrey, spacing };
 
 			if (addedToMap == false) {
 				faMap.put(fa.copy(), values);
-//				System.out.println("\tadding to FA map. size: " + faMap.size());
+				// System.out.println("\tadding to FA map. size: " +
+				// faMap.size());
 			}
 		}
 
 		currentLowestPoint = backArrowHeight;
 		addedToMap = true;
 
-		repaint();
+		if (btnNext.isEnabled()) {
+			repaint();
+		}
 	}
 
 	private void redraw() {
@@ -167,6 +174,8 @@ public class FA_Converter_Panel extends JPanel {
 		spacing = 150;
 		drawer.setCentre(centrex, centrey);
 		drawer.setSpacing(spacing);
+		resetRegexLabelText();
+		resetDoneLabelText();
 
 		faMap = new HashMap<>();
 		btnNext.setEnabled(true);
@@ -177,35 +186,90 @@ public class FA_Converter_Panel extends JPanel {
 	}
 
 	public void removeState() {
-		addedToMap = false;
-		
-//		System.out.println("removing state. size of fa Map: " + faMap.size());
+		if (fa != null) {
 
-		spacing = spacing + 50;
-		drawer.setSpacing(spacing);
-		centrey += 100;
+			addedToMap = false;
 
-		if (fa.getFinalStates().size() > 1) {
-			fa = converter.createNewFinalState(fa);
+			// System.out.println("removing state. size of fa Map: " +
+			// faMap.size());
 
-		} else {
-			ArrayList<State> states = converter.getStatesToRemove(fa);
+			spacing = spacing + 50;
+			drawer.setSpacing(spacing);
+			centrey += 100;
 
-			if (!states.isEmpty()) {
-				State state = states.get(0);
-				remover.removeConnectionsTo(state, fa);
+			if (fa.getFinalStates().size() > 1) {
+				fa = converter.createNewFinalState(fa);
+
 			} else {
-				State initial = fa.getInitialState();
+				ArrayList<State> states = converter.getStatesToRemove(fa);
 
-				if (initial.isFinalState() == true) {
-					fa = remover.splitUpInitialAndFinalStates(fa);
+				if (!states.isEmpty()) {
+					State state = states.get(0);
+					remover.removeConnectionsTo(state, fa);
 
+					checkFinished();
 				} else {
-					cleanUpInitialAndFinalStates();
+					State initial = fa.getInitialState();
+
+					if (initial.isFinalState() == true) {
+						fa = remover.splitUpInitialAndFinalStates(fa);
+
+					} else if (checkFinished() == false) {
+						cleanUpInitialAndFinalStates();
+					}
+				}
+			}
+			if (btnNext.isEnabled()) {
+				repaint();
+			}
+		}
+	}
+
+	private boolean checkFinished() {
+		// called when there is only the final and initial state left
+		if (fa.getStateCount() == 2) {
+
+			State initialState = fa.getInitialState();
+			State finalState = fa.getFinalStates().get(0);
+
+			ArrayList<String> initialTransitions = initialState.getTransitionsTo(finalState);
+			
+
+			if (initialTransitions.size() == 0) {
+				// there are no transitions
+				lblRegex.setText("\\ FA accepts no words");
+				btnNext.setEnabled(false);
+				lblDone.setText("Done");
+				
+				addedToMap = true;
+
+				return true;
+			} else {
+
+//				int finalTransitions = finalState.getTransitions().size();
+				
+				ArrayList<String> finalTransitions = finalState.getTransitionsTo(initialState);
+
+				if (initialTransitions.size() == 1 && finalTransitions.size() == 0) {
+
+					// there is a single transition left
+					String regex = initialState.getTransitionsTo(finalState).get(0);
+					lblRegex.setText(regex);
+					lblDone.setText("Done");
+					btnNext.setEnabled(false);
+					addedToMap = true;
+
+					int width = lblRegex.getText().length();
+					if (width >= 60) {
+						spacing += 200;
+						drawer.setSpacing(spacing);
+					}
+					return true;
 				}
 			}
 		}
-		repaint();
+
+		return false;
 	}
 
 	private void cleanUpInitialAndFinalStates() {
@@ -217,113 +281,121 @@ public class FA_Converter_Panel extends JPanel {
 			// there are no transitions
 			lblRegex.setText("\\ FA accepts no words");
 			btnNext.setEnabled(false);
-		}
-
-		transitions = finalState.getTransitionsTo(initialState);
-		if (transitions.size() > 1) {
-			remover.cleanUpMultiArrows(finalState, initialState);
+			lblDone.setText("Done");
 		} else {
-
-			transitions = initialState.getTransitionsTo(finalState);
-
+			// final -> initial
+			transitions = finalState.getTransitionsTo(initialState);
 			if (transitions.size() > 1) {
-				remover.cleanUpMultiArrows(initialState, finalState);
+				remover.cleanUpMultiArrows(finalState, initialState);
 			} else {
+				// initial -> final
+				transitions = initialState.getTransitionsTo(finalState);
 
-				// clean up self pointing arrows
-				transitions = finalState.getTransitionsTo(finalState);
-				if (transitions.size() > 0) {
-					remover.cleanUpSelfPointingArrows(finalState);
-
-					// add to the start of final->initial
-					// // add to the end of intial-> final
-					String label = finalState.getTransitionsTo(finalState).get(0);
-
-					transitions = finalState.getTransitionsTo(initialState);
-					if (transitions.size() > 0) {
-						String finalToInitial = transitions.get(0); // cleaned
-																	// up
-						finalState.removeTransitionTo(initialState);
-						finalState.addTransition(initialState, label + finalToInitial);
-					}
-
-					transitions = initialState.getTransitionsTo(finalState);
-					if (transitions.size() > 0) {
-						String initialToFinal = transitions.get(0);
-						initialState.removeTransitionTo(finalState);
-						initialState.addTransition(finalState, initialToFinal + label);
-					}
-
-					finalState.removeTransitionTo(finalState);
-
+				if (transitions.size() > 1) {
+					remover.cleanUpMultiArrows(initialState, finalState);
 				} else {
-					// clean up self pointing arrows for initial
-					transitions = initialState.getTransitionsTo(initialState);
+
+					// final -> final
+					transitions = finalState.getTransitionsTo(finalState);
 					if (transitions.size() > 0) {
-						remover.cleanUpSelfPointingArrows(initialState);
+						remover.cleanUpSelfPointingArrows(finalState);
 
-						// add to the end of final->initial
-						// // add to the start of intial-> final
-						String label = initialState.getTransitionsTo(initialState).get(0);
+						// add to the start of final->initial
+						// // add to the end of intial-> final
+						String label = finalState.getTransitionsTo(finalState).get(0);
 
+						// final -> initial
 						transitions = finalState.getTransitionsTo(initialState);
 						if (transitions.size() > 0) {
 							String finalToInitial = transitions.get(0); // cleaned
 																		// up
 							finalState.removeTransitionTo(initialState);
-							finalState.addTransition(initialState, finalToInitial + label);
+							finalState.addTransition(initialState, label + finalToInitial);
 						}
 
+						// initial -> final
 						transitions = initialState.getTransitionsTo(finalState);
 						if (transitions.size() > 0) {
 							String initialToFinal = transitions.get(0);
 							initialState.removeTransitionTo(finalState);
-							initialState.addTransition(finalState, label + initialToFinal);
+							initialState.addTransition(finalState, initialToFinal + label);
 						}
 
-						initialState.removeTransitionTo(initialState);
+						finalState.removeTransitionTo(finalState);
+
 					} else {
-
-						// will either have final->initial, and initial->final
-						// or just initial->final
-						// in which case, return the label
-
-						transitions = finalState.getTransitionsTo(initialState);
+						// clean up self pointing arrows for initial
+						transitions = initialState.getTransitionsTo(initialState);
 						if (transitions.size() > 0) {
-							String initialToFinalLabel = initialState.getTransitionsTo(finalState).get(0);
-							String finalToInitialLabel = transitions.get(0);
+							remover.cleanUpSelfPointingArrows(initialState);
 
-							String label = initialToFinalLabel + "|(" + initialToFinalLabel + finalToInitialLabel
-									+ initialToFinalLabel + ")*";
+							// add to the end of final->initial
+							// // add to the start of intial-> final
+							String label = initialState.getTransitionsTo(initialState).get(0);
 
-							finalState.removeTransitionTo(initialState);
-							initialState.removeTransitionTo(finalState);
-							initialState.addTransition(finalState, label);
-							// } else {
-
-							// only initial -> final
-							String regex = initialState.getTransitionsTo(finalState).get(0);
-							lblRegex.setText(regex);
-							btnNext.setEnabled(false);
-
-							int width = lblRegex.getText().length();
-							if (width >= 60) {
-								spacing += 200;
-								drawer.setSpacing(spacing);
+							transitions = finalState.getTransitionsTo(initialState);
+							if (transitions.size() > 0) {
+								String finalToInitial = transitions.get(0); // cleaned
+																			// up
+								finalState.removeTransitionTo(initialState);
+								finalState.addTransition(initialState, finalToInitial + label);
 							}
+
+							transitions = initialState.getTransitionsTo(finalState);
+							if (transitions.size() > 0) {
+								String initialToFinal = transitions.get(0);
+								initialState.removeTransitionTo(finalState);
+								initialState.addTransition(finalState, label + initialToFinal);
+							}
+
+							initialState.removeTransitionTo(initialState);
 						} else {
-							
-							// should just be left with initial -> final
-							String regex = initialState.getTransitionsTo(finalState).get(0);
-							lblRegex.setText(regex);
-							btnNext.setEnabled(false);
 
-							int width = lblRegex.getText().length();
-							if (width >= 60) {
-								spacing += 200;
-								drawer.setSpacing(spacing);
+							// will either have final->initial, and
+							// initial->final
+							// or just initial->final
+							// in which case, return the label
+
+							transitions = finalState.getTransitionsTo(initialState);
+							if (transitions.size() > 0) {
+								String initialToFinalLabel = initialState.getTransitionsTo(finalState).get(0);
+								String finalToInitialLabel = transitions.get(0);
+
+								String label = initialToFinalLabel + "|(" + initialToFinalLabel + finalToInitialLabel
+										+ initialToFinalLabel + ")*";
+
+								finalState.removeTransitionTo(initialState);
+								initialState.removeTransitionTo(finalState);
+								initialState.addTransition(finalState, label);
+								// } else {
+
+								// only initial -> final
+								String regex = initialState.getTransitionsTo(finalState).get(0);
+								lblRegex.setText(regex);
+								lblDone.setText("Done");
+								btnNext.setEnabled(false);
+
+								int width = lblRegex.getText().length();
+								if (width >= 60) {
+									spacing += 200;
+									drawer.setSpacing(spacing);
+								}
+							} else {
+
+								// should just be left with initial -> final
+								String regex = initialState.getTransitionsTo(finalState).get(0);
+								lblRegex.setText(regex);
+								lblDone.setText("Done");
+								btnNext.setEnabled(false);
+
+								int width = lblRegex.getText().length();
+
+								if (width >= 60) {
+									spacing += 200;
+									drawer.setSpacing(spacing);
+								}
+
 							}
-							
 						}
 					}
 				}
@@ -337,6 +409,14 @@ public class FA_Converter_Panel extends JPanel {
 
 	public void resetRegexLabelText() {
 		lblRegex.setText("");
+	}
+
+	public void setDoneLabel(JLabel label) {
+		this.lblDone = label;
+	}
+
+	public void resetDoneLabelText() {
+		lblDone.setText("");
 	}
 
 	public void setNextButton(JButton next) {
