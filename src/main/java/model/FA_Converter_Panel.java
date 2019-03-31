@@ -422,6 +422,14 @@ public class FA_Converter_Panel extends JPanel {
 	public void setNextButton(JButton next) {
 		this.btnNext = next;
 	}
+	
+	public void resetPage(){
+		resetRegexLabelText();
+		resetDoneLabelText();
+		
+		fa = null;
+		
+	}
 
 }
 //

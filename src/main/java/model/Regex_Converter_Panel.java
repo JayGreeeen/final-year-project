@@ -413,5 +413,10 @@ public class Regex_Converter_Panel extends JPanel {
 	public void setNextButton(JButton next) {
 		this.btnNext = next;
 	}
+	
+	public void resetPage(){
+		left = null;
+		fa = null;
+	}
 
 }
