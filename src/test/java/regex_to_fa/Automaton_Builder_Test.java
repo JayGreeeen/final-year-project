@@ -3,7 +3,7 @@ package regex_to_fa;
 import org.junit.Test;
 
 import regex_to_fa.Automaton_Builder;
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
 import toolbox.Tree_Node;
 
@@ -34,7 +34,7 @@ public class Automaton_Builder_Test {
 
 		Tree_Node.LeafNode node = new Tree_Node.LeafNode(label);
 
-		Finite_Automata actual = builder.buildSimpleAutomaton(node);
+		Finite_Automaton actual = builder.buildSimpleAutomaton(node);
 		
 		State initial = actual.getInitialState();
 		assertEquals(stateCount, actual.getStateCount());
@@ -66,10 +66,10 @@ public class Automaton_Builder_Test {
 		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
 		Tree_Node.LeafNode node2 = new Tree_Node.LeafNode(label2);
 		
-		Finite_Automata FA1 = builder.buildSimpleAutomaton(node1);
-		Finite_Automata FA2 = builder.buildSimpleAutomaton(node2);
+		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
+		Finite_Automaton FA2 = builder.buildSimpleAutomaton(node2);
 		
-		Finite_Automata actual = builder.combineWithConcat(FA1, FA2);
+		Finite_Automaton actual = builder.combineWithConcat(FA1, FA2);
 
 		String finalLabel = "4";
 		inputAlphabet.add(label1);
@@ -118,10 +118,10 @@ public class Automaton_Builder_Test {
 		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
 		Tree_Node.LeafNode node2 = new Tree_Node.LeafNode(label2);
 		
-		Finite_Automata FA1 = builder.buildSimpleAutomaton(node1);
-		Finite_Automata FA2 = builder.buildSimpleAutomaton(node2);
+		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
+		Finite_Automaton FA2 = builder.buildSimpleAutomaton(node2);
 		
-		Finite_Automata actual = builder.combineWithUnion(FA1, FA2);
+		Finite_Automaton actual = builder.combineWithUnion(FA1, FA2);
 
 		String finalLabel = "5";
 		inputAlphabet.add(label1);
@@ -170,8 +170,8 @@ public class Automaton_Builder_Test {
 		inputAlphabet.add(label1);
 		
 		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
-		Finite_Automata FA1 = builder.buildSimpleAutomaton(node1);
-		Finite_Automata actual = builder.addStarOperator(FA1);
+		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
+		Finite_Automaton actual = builder.addStarOperator(FA1);
 		
 		String finalLabel = "3";
 		int stateCount = 4;
@@ -239,11 +239,11 @@ public class Automaton_Builder_Test {
 		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
 		Tree_Node.LeafNode node2 = new Tree_Node.LeafNode(label2);
 		
-		Finite_Automata FA1 = builder.buildSimpleAutomaton(node1);
-		Finite_Automata FA2 = builder.buildSimpleAutomaton(node2);
+		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
+		Finite_Automaton FA2 = builder.buildSimpleAutomaton(node2);
 		
-		Finite_Automata union = builder.combineWithUnion(FA1, FA2);
-		Finite_Automata star = builder.addStarOperator(union);
+		Finite_Automaton union = builder.combineWithUnion(FA1, FA2);
+		Finite_Automaton star = builder.addStarOperator(union);
 		
 		String finalLabel = "7";
 		int stateCount = 8;

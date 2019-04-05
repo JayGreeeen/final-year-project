@@ -14,6 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+/**
+ * Class which creates the Help page interface
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class HelpFrame {
 
 	private JFrame frame;
@@ -46,6 +52,10 @@ public class HelpFrame {
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Adds components to the pane
+	 * @param pane
+	 */
 	private void addComponentsToPane(Container pane) {
 
 		JTabbedPane tabbedPane = new JTabbedPane();
@@ -71,6 +81,9 @@ public class HelpFrame {
 
 	}
 
+	/**
+	 * Sets up initial help page
+	 */
 	private void addToHelpPane() {
 		JPanel panel1 = new JPanel(new BorderLayout());
 		JPanel panel2 = new JPanel(new BorderLayout());
@@ -124,6 +137,9 @@ public class HelpFrame {
 		helpCard.add(p, BorderLayout.CENTER);
 	}
 
+	/**
+	 * Sets up regex help
+	 */
 	private void addToRegexHelpPane() {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.setBackground(new Color(0, 153, 153));
@@ -206,6 +222,7 @@ public class HelpFrame {
 		
 		panel.add(editorPane, BorderLayout.CENTER);
 	}
+	
 	private void addToUnionCard(JPanel panel){
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);
@@ -229,6 +246,7 @@ public class HelpFrame {
 		
 		panel.add(editorPane, BorderLayout.CENTER);
 	}
+	
 	private void addToKleeneCard(JPanel panel){
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);
@@ -252,6 +270,9 @@ public class HelpFrame {
 		panel.add(editorPane, BorderLayout.CENTER);
 	}
 
+	/**
+	 * Adds to FA help page
+	 */
 	private void addToFaHelpPane() {
 		JEditorPane editorPane = new JEditorPane();
 		editorPane.setEditable(false);

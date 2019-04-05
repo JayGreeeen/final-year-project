@@ -8,6 +8,9 @@ import toolbox.Tree_Node;
 
 import java.util.Stack;
 
+/*
+ * Builds a binary tree based on regex input
+ */
 public class Tree_Builder {
 
 	private String regex;
@@ -22,15 +25,18 @@ public class Tree_Builder {
 		parentStack = new Stack<Tree_Node>();
 	}
 
+	/**
+	 * Builds the binary tree
+	 * 
+	 * @return the root node of the tree
+	 */
 	public Tree_Node buildTree() {
-		// System.out.println("Building tree for " + regex);
 		char[] chars = regex.toCharArray();
 
 		for (int i = 0; i < regex.length(); i++) {
 			char c = chars[i];
 
 			if (c == '(') {
-				// System.out.println("Opening bracket");
 
 				int closingBracketPosition = bracketMap.get(i);
 				int lastCharPosition = regex.length() - 1;
@@ -43,7 +49,6 @@ public class Tree_Builder {
 
 					if (nextChar == '*') {
 						// (...)*
-						// System.out.println("Closing bracket followed by *");
 
 						if (nextCharPosition != lastCharPosition) {
 							addConcatNode();
@@ -53,8 +58,6 @@ public class Tree_Builder {
 						// generate subtree for substring between brackets
 						String substr = regex.substring(i + 1, closingBracketPosition);
 						Tree_Node subtree = generateSubtree(substr);
-						// System.out.println("Generated subtree for " + substr
-						// + " . Root: " + subtree);
 						addChildToParent(subtree);
 
 						i = nextCharPosition;
@@ -71,8 +74,6 @@ public class Tree_Builder {
 
 						Tree_Node subtree = generateSubtree(substr);
 						addChildToParent(subtree);
-						// System.out.println("\t Generated subtree for " +
-						// substr + " . Root: " + subtree);
 
 						i = closingBracketPosition;
 					}
@@ -83,8 +84,6 @@ public class Tree_Builder {
 
 					Tree_Node subtree = generateSubtree(substr);
 					addChildToParent(subtree);
-					// System.out.println("\t Generated subtree for " + substr +
-					// " . Root: " + subtree);
 					i = closingBracketPosition;
 				}
 
@@ -94,7 +93,6 @@ public class Tree_Builder {
 				// brackets
 				int closingBracketPosition = insideBrackets(i);
 				if (closingBracketPosition != -1) {
-					// System.out.println("Union symbol found inside brackets");
 
 					Tree_Node parent = getCurrentParent();
 					if (parent instanceof Tree_Node.ConcatNode) {
@@ -138,8 +136,6 @@ public class Tree_Builder {
 					 * 	 /			 /
 					 *  b			b
 					 */
-					// System.out.println("Union symbol found outside brackets.
-					// Adding union node as new root");
 
 					Tree_Node unionNode = new Tree_Node.UnionNode();
 					unionNode.addChild(root);
@@ -148,35 +144,24 @@ public class Tree_Builder {
 
 					Tree_Node currentParent = getCurrentParent();
 					Tree_Node leftChild = currentParent.getLeftChild();
-					// System.out
-					// .println("Replacing current parent " + currentParent + "
-					// with its left child " + leftChild);
 
 					if (currentParent != root) {
 						Tree_Node ancestor = currentParent.getParent();
 
-						// **************
 						ancestor.replaceChild(currentParent, leftChild);
 
 						leftChild.setParent(ancestor);
-						// System.out.println("ancestor " + ancestor + " is the
-						// new parent of " + leftChild);
 					}
 					parentStack.pop();
 					parentStack.insertElementAt(unionNode, 0);
-					// System.out.println("Stack: " + parentStack);
 				}
 
 			} else if (Character.isLetterOrDigit(c)) {
-				// System.out.println("Symbol of alphabet: " + c);
-
 				int nextCharPosition = i + 1;
 
 				if (nextCharPosition == regex.length() || chars[nextCharPosition] == ')') {
-					// System.out.println("Next symbol is null or )");
 					addLeafToParent(c);
 				} else if (chars[nextCharPosition] == '*') {
-					// System.out.println("next symbol is *");
 
 					if (nextCharPosition < regex.length() - 1) {
 						// if * is NOT the last char
@@ -194,12 +179,25 @@ public class Tree_Builder {
 		return root;
 	}
 
+	/**
+	 * Generates a subtree for regex between brackets
+	 * 
+	 * @param regex
+	 *            to build the subtree for
+	 * @return the root of the subtree
+	 */
 	private Tree_Node generateSubtree(String regex) {
 		Tree_Builder builder = new Tree_Builder(regex);
 		Tree_Node subtree = builder.buildTree();
 		return subtree;
 	}
 
+	/**
+	 * Creates a map of the brackets in the regex
+	 * 
+	 * @param substring
+	 * @return
+	 */
 	private Map<Integer, Integer> generateBracketMap(String substring) {
 		Map<Integer, Integer> bracketMap = new HashMap<Integer, Integer>();
 
@@ -222,8 +220,10 @@ public class Tree_Builder {
 		return bracketMap;
 	}
 
+	/**
+	 * Adds a concatenation node, •, to the binary tree
+	 */
 	private void addConcatNode() {
-		// System.out.println("Added • node");
 		Tree_Node concatNode;
 		if (root == null) {
 			concatNode = new Tree_Node.ConcatNode(null);
@@ -232,15 +232,15 @@ public class Tree_Builder {
 			Tree_Node parent = getCurrentParent();
 			concatNode = new Tree_Node.ConcatNode(parent);
 
-			// *************
 			addChildToParent(concatNode);
 		}
 		parentStack.push(concatNode);
-		// System.out.println("Added • node to stack. Stack: " + parentStack);
 	}
 
+	/**
+	 * Adds a Kleene star node, *, to the binary tree
+	 */
 	private void addStarNode() {
-		// System.out.println("Added * node");
 		Tree_Node starNode;
 		if (root == null) {
 			starNode = new Tree_Node.StarNode(null);
@@ -249,13 +249,15 @@ public class Tree_Builder {
 			Tree_Node parent = getCurrentParent();
 			starNode = new Tree_Node.StarNode(parent);
 
-			// ***********
 			addChildToParent(starNode);
 		}
 		parentStack.push(starNode);
-		// System.out.println("Added * node to stack. Stack: " + parentStack);
 	}
 
+	/**
+	 * 
+	 * @return the current parent which has a child node space available
+	 */
 	private Tree_Node getCurrentParent() {
 		if (!parentStack.isEmpty()) {
 			return parentStack.peek();
@@ -263,10 +265,21 @@ public class Tree_Builder {
 		return null;
 	}
 
+	/**
+	 * adds a leaf node to the current parent node
+	 * 
+	 * @param c
+	 *            - the char of the child node
+	 */
 	private void addLeafToParent(char c) {
 		addChildToParent(new Tree_Node.LeafNode(Character.toString(c)));
 	}
 
+	/**
+	 * Handles how the child is added to the current parent
+	 * 
+	 * @param child
+	 */
 	private void addChildToParent(Tree_Node child) {
 		Tree_Node parent = getCurrentParent();
 
@@ -276,30 +289,24 @@ public class Tree_Builder {
 		} else {
 			parent.addChild(child);
 			child.setParent(parent);
-			// System.out.println("Adding " + child.getText() + " to parent " +
-			// parent + ". parent has "
-			// + parent.getChildCount() + " children");
 
 			if (parent instanceof Tree_Node.StarNode && parent.getChildCount() == 1) {
 				Tree_Node prevParent = parentStack.pop();
-				// System.out.println("Parent node full - removing " +
-				// prevParent + ". Stack: " + parentStack);
-
-				// if (!parentStack.isEmpty()) {
-				// addChildToParent(prevParent);
-				// }
 
 			} else if (parent.getChildCount() == 2) {
 				Tree_Node prevParent = parentStack.pop();
-				// System.out.println("Parent node full - removing " +
-				// prevParent + ". Stack: " + parentStack);
-				// if (!parentStack.isEmpty()) {
-				// addChildToParent(prevParent);
-				// }
 			}
 		}
 	}
 
+	/**
+	 * Checks to see if this position is inside brackets
+	 * 
+	 * @param position
+	 *            - index position in the regex
+	 * @return -1 if its not inside brackets, or the position of the closing
+	 *         bracket if it is inside brackets
+	 */
 	private int insideBrackets(int position) {
 		int endBracketPosition = -1;
 

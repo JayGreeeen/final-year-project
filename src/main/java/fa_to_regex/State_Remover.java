@@ -2,7 +2,7 @@ package fa_to_regex;
 
 import java.util.ArrayList;
 
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
 
 public class State_Remover {
@@ -11,7 +11,7 @@ public class State_Remover {
 	}
 
 	// public Finite_Automata remove(State state, Finite_Automata oldfa) {
-	public void removeConnectionsTo(State state, Finite_Automata oldfa) {
+	public void removeConnectionsTo(State state, Finite_Automaton oldfa) {
 		ArrayList<State> states = oldfa.getStates();
 
 		// states which point to this state
@@ -74,7 +74,7 @@ public class State_Remover {
 	// TODO 
 	// ***************************
 	// the case for when the initial and final states are the same
-	private void singleStateAutomaton(Finite_Automata fa) {
+	private void singleStateAutomaton(Finite_Automaton fa) {
 		cleanUpSelfPointingArrows(fa.getInitialState());
 	}
 
@@ -148,7 +148,7 @@ public class State_Remover {
 		return label;
 	}
 	
-	public Finite_Automata splitUpInitialAndFinalStates(Finite_Automata fa){
+	public Finite_Automaton splitUpInitialAndFinalStates(Finite_Automaton fa){
 		// for the case when the final and initial stateds are the same
 		
 		State initial = fa.getInitialState();
@@ -173,7 +173,7 @@ public class State_Remover {
 		ArrayList<String> inputAlphabet = new ArrayList<>();
 		inputAlphabet.addAll(fa.getInputAlphabet());
 		
-		return new Finite_Automata(initial, finalStates, states, inputAlphabet);
+		return new Finite_Automaton(initial, finalStates, states, inputAlphabet);
 		
 	}
 

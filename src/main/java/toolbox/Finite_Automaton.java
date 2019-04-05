@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class Finite_Automata {
+public class Finite_Automaton {
 
 	private State initialState;
 	private ArrayList<State> finalStates;
@@ -12,7 +12,7 @@ public class Finite_Automata {
 	private ArrayList<State> states;
 	// private TransitionTable transitions;
 
-	public Finite_Automata(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
+	public Finite_Automaton(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
 			ArrayList<String> inputAlphabet) {
 		this.initialState = initialState;
 		this.finalStates = finalStates;
@@ -66,7 +66,7 @@ public class Finite_Automata {
 				+ "\nInput alphabet: " + inputAlphabet + "\nTransitions: " + transitionOutput;
 	}
 
-	public Finite_Automata copy() {
+	public Finite_Automaton copy() {
 		ArrayList<State> finalStatesList = new ArrayList<>();
 //		finalStatesList.addAll(finalStates);
 		
@@ -115,7 +115,7 @@ public class Finite_Automata {
 		inputList.addAll(inputAlphabet);
 
 		
-		return new Finite_Automata(initial, finalStatesList, stateList, inputList);
+		return new Finite_Automaton(initial, finalStatesList, stateList, inputList);
 	}
 	
 	private State getState(String label, ArrayList<State> states) {

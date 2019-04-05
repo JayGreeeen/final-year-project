@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
 import toolbox.Tree_Node.LeafNode;
 
@@ -15,7 +15,7 @@ public class Automaton_Builder {
 
 	// create basic automaton for a leaf node - single transition
 	// initial state -- node text --> final state
-	public Finite_Automata buildSimpleAutomaton(LeafNode node) {
+	public Finite_Automaton buildSimpleAutomaton(LeafNode node) {
 		String label = node.getText();
 
 		// initial state
@@ -40,11 +40,11 @@ public class Automaton_Builder {
 		// transitions
 		initialState.addTransition(finalState, label);
 
-		return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
+		return new Finite_Automaton(initialState, finalStates, states, inputAlphabet);
 	}
 
 	// combine with union symbol - rule 3
-	public Finite_Automata combineWithUnion(Finite_Automata FA1, Finite_Automata FA2) {
+	public Finite_Automaton combineWithUnion(Finite_Automaton FA1, Finite_Automaton FA2) {
 		State initialState = createNewInitialState();
 
 		int totalStateCount = FA1.getStateCount() + FA2.getStateCount();
@@ -80,11 +80,11 @@ public class Automaton_Builder {
 		inputAlphabet.addAll(FA1.getInputAlphabet());
 		inputAlphabet.addAll(FA2.getInputAlphabet());
 
-		return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
+		return new Finite_Automaton(initialState, finalStates, states, inputAlphabet);
 	}
 
 	// combine with concat symbol = rule 4
-	public Finite_Automata combineWithConcat(Finite_Automata FA1, Finite_Automata FA2) {
+	public Finite_Automaton combineWithConcat(Finite_Automaton FA1, Finite_Automaton FA2) {
 		State initialState = createNewInitialState();
 
 		State initialStateFA1 = FA1.getInitialState();
@@ -121,7 +121,7 @@ public class Automaton_Builder {
 		inputAlphabet.addAll(FA1.getInputAlphabet());
 		inputAlphabet.addAll(FA2.getInputAlphabet());
 
-		return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
+		return new Finite_Automaton(initialState, finalStates, states, inputAlphabet);
 	}
 
 	private State combineStates(State state1, State state2) {
@@ -135,7 +135,7 @@ public class Automaton_Builder {
 	}
 
 	// star operator - rule 5
-	public Finite_Automata addStarOperator(Finite_Automata FA) {
+	public Finite_Automaton addStarOperator(Finite_Automaton FA) {
 		State initialState = createNewInitialState();
 		State finalState = createNewFinalState(FA.getStateCount());
 
@@ -157,7 +157,7 @@ public class Automaton_Builder {
 		oldFinal.addEmptyTransition(finalState);
 		oldFinal.addEmptyTransition(oldInitial);
 
-		return new Finite_Automata(initialState, finalStates, states, FA.getInputAlphabet());
+		return new Finite_Automaton(initialState, finalStates, states, FA.getInputAlphabet());
 	}
 
 	private ArrayList<State> renameStates(ArrayList<State> statesSet1, ArrayList<State> statesSet2) {

@@ -16,17 +16,23 @@ import javax.swing.JPanel;
 import fa_to_regex.FA_to_Regex;
 import fa_to_regex.State_Remover;
 import toolbox.FA_Dimension;
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
 import view.FA_Drawer;
 
+/**
+ * The panel which handles the display of the FA on the FAToRegex page
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class FA_Converter_Panel extends JPanel {
 
 	// takes in FA
 	// converts into regex
 	// draws the stages of conversion
-	private Finite_Automata fa = null;
-	private Finite_Automata initialFA = null;
+	private Finite_Automaton fa = null;
+	private Finite_Automaton initialFA = null;
 
 	private FA_to_Regex converter;
 	private State_Remover remover;
@@ -45,7 +51,7 @@ public class FA_Converter_Panel extends JPanel {
 
 	private int currentLowestPoint = 0;
 
-	private Map<Finite_Automata, Integer[]> faMap;
+	private Map<Finite_Automaton, Integer[]> faMap;
 	private boolean addedToMap = false;
 
 	public FA_Converter_Panel() {
@@ -73,8 +79,12 @@ public class FA_Converter_Panel extends JPanel {
 		}
 	}
 
-	private void paintFA(Finite_Automata fa) {
-		// System.out.println("painting FA: " + centrex + ", " + centrey);
+	/**
+	 * Paints the fa to the screen
+	 * 
+	 * @param fa
+	 */
+	private void paintFA(Finite_Automaton fa) {
 		drawer.setCentre(centrex, centrey);
 		drawer.drawFA(fa);
 
@@ -84,33 +94,20 @@ public class FA_Converter_Panel extends JPanel {
 		int backArrowHeight = dimension.getBackTransitionHeight();
 		int length = dimension.getLength();
 
-		// System.out.println("forward arrow height: " + forwardArrowHeight + ".
-		// Back arrow height: " + backArrowHeight);
-
 		if (forwardArrowHeight <= 10) {
-//			 System.out.println("goes off the page");
-			// goes off the page
 			centrey += (0 - forwardArrowHeight) + 50;
 			backArrowHeight += (0 - forwardArrowHeight) + 50;
 		}
 
 		if (length >= frameWidth) {
-			// System.out.println("wider than the page - length: " + length + "
-			// > " + frameWidth);
 			setFrameSize(length + 200, frameHeight);
 		}
 
 		if (backArrowHeight >= frameHeight - 100) {
-			// System.out.println("lowest point, goes off the page: " +
-			// backArrowHeight);
-			// System.out.println("longer than the page");
 			setFrameSize(frameWidth, backArrowHeight + 200);
 		}
 
-//		 System.out.println("\tCurrent lowest point: " + currentLowestPoint + ". forward height: " + forwardArrowHeight);
-
 		if (currentLowestPoint != 0 && forwardArrowHeight <= currentLowestPoint) {
-			// System.out.println("moving down");
 			int difference;
 			if (forwardArrowHeight < 0) {
 				difference = currentLowestPoint - (0 - forwardArrowHeight);
@@ -124,15 +121,12 @@ public class FA_Converter_Panel extends JPanel {
 			if (addedToMap == false) {
 				Integer[] values = { centrex, centrey, spacing };
 				faMap.put(fa.copy(), values);
-				// System.out.println("\tadding to FA map");
 			}
 		} else {
 			Integer[] values = { centrex, centrey, spacing };
 
 			if (addedToMap == false) {
 				faMap.put(fa.copy(), values);
-				// System.out.println("\tadding to FA map. size: " +
-				// faMap.size());
 			}
 		}
 
@@ -144,12 +138,15 @@ public class FA_Converter_Panel extends JPanel {
 		}
 	}
 
+	/**
+	 * Redraws all the previous steps
+	 */
 	private void redraw() {
-		Finite_Automata fa;
+		Finite_Automaton fa;
 		Integer[] values;
 
-		for (Entry<Finite_Automata, Integer[]> entry : faMap.entrySet()) {
-			fa = (Finite_Automata) entry.getKey();
+		for (Entry<Finite_Automaton, Integer[]> entry : faMap.entrySet()) {
+			fa = (Finite_Automaton) entry.getKey();
 			values = entry.getValue();
 
 			drawer.setSpacing(values[2]);
@@ -158,13 +155,24 @@ public class FA_Converter_Panel extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the size of the frame
+	 * 
+	 * @param width
+	 * @param height
+	 */
 	private void setFrameSize(int width, int height) {
 		this.setPreferredSize(new Dimension(width, height));
 		frameWidth = width;
 		frameHeight = height;
 	}
 
-	public void convert(Finite_Automata fa) {
+	/**
+	 * Performs the initial conversion step when the convert button is pressed
+	 * 
+	 * @param fa
+	 */
+	public void convert(Finite_Automaton fa) {
 		if (initialFA == null) {
 			initialFA = fa;
 		}
@@ -185,14 +193,13 @@ public class FA_Converter_Panel extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * Removes a state from the FA each time the 'next' button is pressed
+	 */
 	public void removeState() {
 		if (fa != null) {
 
 			addedToMap = false;
-
-			// System.out.println("removing state. size of fa Map: " +
-			// faMap.size());
-
 			spacing = spacing + 50;
 			drawer.setSpacing(spacing);
 			centrey += 100;
@@ -225,6 +232,12 @@ public class FA_Converter_Panel extends JPanel {
 		}
 	}
 
+	/**
+	 * Checks to see if the FA consists of only an initial and final state with
+	 * a single transition
+	 * 
+	 * @return
+	 */
 	private boolean checkFinished() {
 		// called when there is only the final and initial state left
 		if (fa.getStateCount() == 2) {
@@ -233,21 +246,18 @@ public class FA_Converter_Panel extends JPanel {
 			State finalState = fa.getFinalStates().get(0);
 
 			ArrayList<String> initialTransitions = initialState.getTransitionsTo(finalState);
-			
 
 			if (initialTransitions.size() == 0) {
 				// there are no transitions
 				lblRegex.setText("\\ FA accepts no words");
 				btnNext.setEnabled(false);
 				lblDone.setText("Done");
-				
+
 				addedToMap = true;
 
 				return true;
 			} else {
 
-//				int finalTransitions = finalState.getTransitions().size();
-				
 				ArrayList<String> finalTransitions = finalState.getTransitionsTo(initialState);
 
 				if (initialTransitions.size() == 1 && finalTransitions.size() == 0) {
@@ -272,6 +282,10 @@ public class FA_Converter_Panel extends JPanel {
 		return false;
 	}
 
+	/**
+	 * Cleans up the arrows around the initial and final states to reduce them
+	 * down to one transition
+	 */
 	private void cleanUpInitialAndFinalStates() {
 		State initialState = fa.getInitialState();
 		State finalState = fa.getFinalStates().get(0);
@@ -367,7 +381,6 @@ public class FA_Converter_Panel extends JPanel {
 								finalState.removeTransitionTo(initialState);
 								initialState.removeTransitionTo(finalState);
 								initialState.addTransition(finalState, label);
-								// } else {
 
 								// only initial -> final
 								String regex = initialState.getTransitionsTo(finalState).get(0);
@@ -403,33 +416,56 @@ public class FA_Converter_Panel extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the regex label to the output of the conversion
+	 * 
+	 * @param label
+	 */
 	public void setRegexLabel(JLabel label) {
 		this.lblRegex = label;
 	}
 
+	/**
+	 * Resets the regex label
+	 */
 	public void resetRegexLabelText() {
 		lblRegex.setText("");
 	}
 
+	/**
+	 * Sets the 'done' label, indicating completion of the conversion
+	 * 
+	 * @param label
+	 */
 	public void setDoneLabel(JLabel label) {
 		this.lblDone = label;
 	}
 
+	/**
+	 * Resets the 'done; label
+	 */
 	public void resetDoneLabelText() {
 		lblDone.setText("");
 	}
 
+	/**
+	 * Sets the next button object
+	 * 
+	 * @param next
+	 */
 	public void setNextButton(JButton next) {
 		this.btnNext = next;
 	}
-	
-	public void resetPage(){
+
+	/**
+	 * Resets the details on the page
+	 */
+	public void resetPage() {
 		resetRegexLabelText();
 		resetDoneLabelText();
-		
+
 		fa = null;
-		
+		setFrameSize(1000, 350);
 	}
 
 }
-//

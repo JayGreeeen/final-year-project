@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import regex_to_fa.Regex_to_FA;
 import toolbox.FA_Dimension;
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.Tree_Node;
 import toolbox.Tree_Node.LeafNode;
 import toolbox.Tree_Node.StarNode;
@@ -24,14 +24,14 @@ public class Regex_Converter_Panel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private Finite_Automata fa = null;
+	private Finite_Automaton fa = null;
 	private Regex_to_FA converter;
 
 	private Tree_Node root;
 	private Tree_Node currentParent;
 
-	private Finite_Automata left;
-	private Finite_Automata right;
+	private Finite_Automaton left;
+	private Finite_Automaton right;
 
 	private FA_Drawer drawer;
 
@@ -45,7 +45,7 @@ public class Regex_Converter_Panel extends JPanel {
 	private int rightCentrey = 300;
 	private int faCentrey = 300;
 
-	private Map<Finite_Automata, Integer[]> faMap;
+	private Map<Finite_Automaton, Integer[]> faMap;
 
 	private boolean leftAdded = true;
 	private boolean rightAdded = true;
@@ -288,11 +288,11 @@ public class Regex_Converter_Panel extends JPanel {
 
 	private void redraw() {
 //		System.out.println("redrawing. map size: " + faMap.size());
-		Finite_Automata fa;
+		Finite_Automaton fa;
 		Integer[] values;
 
-		for (Entry<Finite_Automata, Integer[]> entry : faMap.entrySet()) {
-			fa = (Finite_Automata) entry.getKey();
+		for (Entry<Finite_Automaton, Integer[]> entry : faMap.entrySet()) {
+			fa = (Finite_Automaton) entry.getKey();
 			values = entry.getValue();
 
 			drawer.setCentre(values[0], values[1]);
@@ -417,6 +417,8 @@ public class Regex_Converter_Panel extends JPanel {
 	public void resetPage(){
 		left = null;
 		fa = null;
+		
+		setFrameSize(2000, 500);
 	}
 
 }

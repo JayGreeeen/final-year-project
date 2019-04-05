@@ -47,10 +47,16 @@ import javax.swing.table.DefaultTableModel;
 
 import model.FA_Converter_Panel;
 import model.Regex_Converter_Panel;
-import toolbox.Finite_Automata;
-import toolbox.ReadWriteUtility;
+import toolbox.Finite_Automaton;
+import toolbox.Read_Write_Utility;
 import toolbox.State;
 
+/**
+ * Main class for the tool. Builds the interface and handles functionality
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class Converter {
 
 	final static String REGEX_PANEL = "Convert Regex to FA";
@@ -64,7 +70,7 @@ public class Converter {
 	private JPanel regexCard;
 	private JPanel faCard;
 
-	private static ReadWriteUtility rwu;
+	private static Read_Write_Utility rwu;
 
 	// regex to FA
 	private JButton btnRegexConvert;
@@ -79,7 +85,7 @@ public class Converter {
 	private JTable transitionTable;
 	private JComboBox<String> initialStateCombo;
 	private JList<String> finalStateList;
-	private Finite_Automata faToConvert = null;
+	private Finite_Automaton faToConvert = null;
 
 	public static void main(String[] args) {
 		createAndShowGUI();
@@ -92,7 +98,7 @@ public class Converter {
 		frame = new JFrame("Converter");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		rwu = new ReadWriteUtility();
+		rwu = new Read_Write_Utility();
 
 		// Create and set up the content pane.
 		Converter converter = new Converter();
@@ -197,14 +203,14 @@ public class Converter {
 		btnRegexConvert.setBorder(BorderFactory.createRaisedBevelBorder());
 		btnRegexConvert.setOpaque(true);
 		btnRegexConvert.setPreferredSize(new Dimension(90, 20));
-		
+
 		JButton btnReset = new JButton("Reset");
 		btnReset.setBackground(new Color(0, 153, 153));
 		btnReset.setBorder(BorderFactory.createRaisedBevelBorder());
 		btnReset.setOpaque(true);
 		btnReset.setPreferredSize(new Dimension(90, 20));
 		btnReset.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				txtRegex.setText("");
@@ -495,9 +501,6 @@ public class Converter {
 		southPanel.add(buttonPanel, BorderLayout.EAST);
 		southPanel.add(regexLabelPanel, BorderLayout.SOUTH);
 
-		// bottomScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		// bottomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, centreScrollPane, southPanel);
 		splitPane.setBackground(new Color(0, 153, 153));
 
@@ -507,528 +510,17 @@ public class Converter {
 		faCard.add(splitPane, BorderLayout.CENTER);
 	}
 
-	class OpenListener implements ActionListener {
-
-		private JTabbedPane pane;
-
-		public OpenListener(JTabbedPane pane) {
-			this.pane = pane;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			int index = pane.getSelectedIndex();
-			Component tab = pane.getComponent(index);
-
-			String name = tab.getName();
-
-			String targetFolder = "/target";
-			String workingDir = System.getProperty("user.dir");
-
-			if (name == "RegexToFA") {
-				File dir = new File(workingDir + targetFolder, "Saved Regexs");
-
-				JFileChooser jfc = new JFileChooser(dir);
-				int returnValue = jfc.showOpenDialog(null);
-
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = jfc.getSelectedFile();
-					String regex = rwu.ReadRegexFromFile(selectedFile.getName());
-					txtRegex.setText(regex);
-					faDiagramRegexPanel.resetPage();
-				}
-			} else {
-				// FAToRegex
-				File dir = new File(workingDir + targetFolder, "Saved FAs");
-
-				JFileChooser jfc = new JFileChooser(dir);
-				int returnValue = jfc.showOpenDialog(null);
-
-				if (returnValue == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = jfc.getSelectedFile();
-					String fa = rwu.ReadFAFromFile(selectedFile.getName());
-					convert(fa);
-					faDiagramFAPanel.resetPage();
-				}
-			}
-		}
-
-		private void convert(String stringFA) {
-
-			// ***********************************************
-			// Input Alphabet:[a, b, c]
-			// States:[6, 7, 8]
-			// Transitions:[6:a> 6 7, 7:b> 8, 8:c>6]
-			// Initial State:6
-			// Final State(s):[8]
-
-			// Input Alphabet:[a, b, c]States:[6, 7, 8]Transitions:[6:a> 6 7,
-			// 7:b> 8, 8:c>6]Initial State:6Final State(s):[8]
-
-			String lblInputAlph = "Input Alphabet:[";
-			int lblInputAlphStart = stringFA.indexOf(lblInputAlph);
-			int lblInputAlphEnd = lblInputAlphStart + lblInputAlph.length();
-
-			String inputAlphString = stringFA.substring(lblInputAlphEnd, stringFA.indexOf("]"));
-//			System.out.println("input alph: " + inputAlphString);
-			// ArrayList<String> inputAlph =
-			// splitIntoArrayList(inputAlphString);
-
-			// txtInputAlphabet.setText("");
-			// for (String input : inputAlph){
-			// txtInputAlphabet.append(input + "\n");
-			// }
-
-			String tmpStringFA = stringFA.substring(stringFA.indexOf("]") + 1, stringFA.length());
-
-			String lblStates = "States:[";
-			int lblStatesStart = tmpStringFA.indexOf(lblStates);
-			int lblStatesEnd = lblStatesStart + lblStates.length();
-
-			String statesString = tmpStringFA.substring(lblStatesEnd, tmpStringFA.indexOf("]"));
-//			System.out.println("states: " + statesString);
-			ArrayList<String> states = splitIntoArrayList(statesString, ",");
-			// txtStates.setText("");
-			// for (String state : states){
-			// txtStates.append(state + "\n");
-			//
-			//// finalStateList.add
-			// }
-
-			tmpStringFA = tmpStringFA.substring(tmpStringFA.indexOf("]") + 1, tmpStringFA.length());
-
-			String lblTransitions = "Transitions:[";
-			int lblTransitionsStart = tmpStringFA.indexOf(lblTransitions);
-			int lblTransitionsEnd = lblTransitionsStart + lblTransitions.length();
-
-			String transitionList = tmpStringFA.substring(lblTransitionsEnd, tmpStringFA.indexOf("]"));
-			ArrayList<String> transitions = splitIntoArrayList(transitionList, ",");
-
-//			System.out.println("transitions: " + transitionList);
-
-			tmpStringFA = tmpStringFA.substring(tmpStringFA.indexOf("]") + 1, tmpStringFA.length());
-			// System.out.println("temp string: " + tmpStringFA);
-
-			// have a map - state from - mapped to a map containing the letter,
-			// and what state it goes to
-
-			// 6:a> 6 7
-			// 7:b> 8
-			// 8:c>6
-			Map<String, Map<String, ArrayList<String>>> transitionMap = new HashMap<>();
-
-			for (String transition : transitions) {
-				String from = transition.substring(0, transition.indexOf(":"));
-
-				if (transitionMap.containsKey(from)) {
-
-					Map<String, ArrayList<String>> inputStates = transitionMap.get(from);
-
-					String input = transition.substring(transition.indexOf(":") + 1, transition.indexOf(">"));
-
-					String stateList = transition.substring(transition.indexOf(">") + 1, transition.length());
-					stateList = stateList.replace("  ", " ");
-					// remove double spaces - occurs when comma is rpelaced by a
-					// space
-
-					ArrayList<String> reachableStates = splitIntoArrayList(stateList, " ");
-					// CHECK WHAT THIS COMES OUT LIKE *******************
-
-					inputStates.put(input, reachableStates);
-
-				} else {
-
-					Map<String, ArrayList<String>> inputStates = new HashMap<>();
-
-					String input = transition.substring(transition.indexOf(":") + 1, transition.indexOf(">"));
-
-					String stateList = transition.substring(transition.indexOf(">") + 1, transition.length());
-
-					stateList = stateList.replace("  ", " ");
-					// remove double spaces - occurs when comma is rpelaced by a
-					// space
-
-					ArrayList<String> reachableStates = splitIntoArrayList(stateList, " ");
-//					System.out.println("\tReachable states from " + from + " are: " + reachableStates);
-
-					inputStates.put(input, reachableStates);
-					transitionMap.put(from, inputStates);
-				}
-
-			}
-
-			String lblInitialState = "Initial State:";
-			int lblInitialStateStart = tmpStringFA.indexOf(lblInitialState);
-			int lblInitialStateEnd = lblInitialStateStart + lblInitialState.length();
-
-			String initialState = tmpStringFA.substring(lblInitialStateEnd, tmpStringFA.indexOf("Final"));
-//			System.out.println("initial state: " + initialState);
-			// set as chosen state in combo box
-			// int index = states.indexOf(initialState);
-			// initialStateCombo.setSelectedIndex(index);
-
-			String lblFinalStates = "Final State(s):[";
-			int lblFinalStatesStart = tmpStringFA.indexOf(lblFinalStates);
-			int lblFinalStatesEnd = lblFinalStatesStart + lblFinalStates.length();
-
-			String finalStatesString = tmpStringFA.substring(lblFinalStatesEnd, tmpStringFA.indexOf("]"));
-//			System.out.println("final states: " + finalStatesString);
-			// set as selected item in list
-
-			ArrayList<String> finalStates = splitIntoArrayList(finalStatesString, ",");
-			int[] finalStateIndices = new int[finalStates.size()];
-
-			// need to go through the list of states, and find which of them is
-			// in the list, and then add the index
-			// to the int array
-
-			int indicesCount = 0;
-
-			for (int i = 0; i < states.size(); i++) {
-				String state = states.get(i);
-
-				if (finalStates.contains(state)) {
-					finalStateIndices[indicesCount] = i;
-					indicesCount++;
-				}
-			}
-
-			// have all the info for creating the FA
-			// just need to actually do something with it all and place it all
-			// in the respective boxes
-			// setting up the transitions should hopefully not be too
-			// complicated
-			// - split on comma to get the separate transitions,
-			// - - reduce large spaces down to a single space
-			// - - will need to separate the values with commas, and then put
-			// into the table
-
-			// do some testing of this - check it works with multiple final
-			// states, etc
-			// will need to create some new files for the demo
-
-			DefaultTableModel tableModel = (DefaultTableModel) transitionTable.getModel();
-			tableModel.setRowCount(0);
-			tableModel.setColumnCount(0);
-
-			Vector<String> columns = new Vector<String>();
-			Vector<String> row = new Vector<String>();
-
-			tableModel.setColumnCount(states.size() + 1);
-			columns.add(" ");
-
-			String[] alphabet = inputAlphString.split(",");
-
-			txtInputAlphabet.setText("");
-
-			for (String str : alphabet) {
-				str = str.trim();
-				txtInputAlphabet.append(str + "\n");
-				columns.add(str);
-			}
-			columns.add("ε");
-
-			txtStates.setText("");
-			finalStateList.removeAll();
-
-			DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
-			DefaultListModel<String> listModel = (DefaultListModel<String>) finalStateList.getModel();
-			listModel.removeAllElements();
-
-			for (String s : states) {
-				txtStates.append(s + "\n");
-				initialStateCombo.addItem(s);
-				comboModel.addElement(s);
-				listModel.addElement(s);
-
-				row.addElement(s);
-
-				Map<String, ArrayList<String>> inputStates = transitionMap.get(s);
-
-				for (String input : alphabet) {
-					input = input.trim();
-
-					if (inputStates.containsKey(input)) {
-
-						ArrayList<String> statesTo = inputStates.get(input);
-						if (!statesTo.isEmpty()) {
-//							System.out.println("With state " + s + " the reachable states are: " + statesTo);
-
-							String stateList = "";
-							for (String to : statesTo) {
-								stateList += to + ", ";
-							}
-							stateList = stateList.substring(0, stateList.lastIndexOf(","));
-
-							row.addElement(stateList);
-						} else {
-							row.addElement("");
-							
-						}
-
-					} else {
-//						System.out.println("No reachable states for state " + s + "with input " + input);
-						row.addElement("");
-					}
-
-				}
-//				System.out.println("Adding row: " + row);
-				tableModel.addRow(row);
-				row = new Vector<String>();
-
-			}
-
-			transitionTable.setModel(tableModel);
-			tableModel.setColumnIdentifiers(columns);
-
-			initialStateCombo.setModel(comboModel);
-			initialStateCombo.setSelectedItem(initialState);
-			finalStateList.setModel(listModel);
-			finalStateList.setSelectedIndices(finalStateIndices);
-
-			// ***********************************************
-
-			// String initialLbl = "\\{\"initialState\":\\{\"label\":";
-			// int initialStartPos = stringFA.indexOf(initialLbl);
-			// int posAfterInitial = initialStartPos + initialLbl.length();
-			//
-			// String initialState = stringFA.substring(posAfterInitial,
-			// stringFA.indexOf(",") - 1);
-			//
-			// String alphabetLbl = "inputAlphabet";
-			//
-			// String stateLbl = "states";
-			// int statesStartPos = stringFA.indexOf(stateLbl);
-			// int posAfterStates = statesStartPos + stateLbl.length(); //
-			// "states":[.....]
-			//
-			// int startIndex = stringFA.indexOf(alphabetLbl) +
-			// alphabetLbl.length() + 2;
-			// String inputAlphabetStr = stringFA.substring(startIndex,
-			// statesStartPos - 2);
-			//
-			// String stateList = stringFA.substring(posAfterStates + 3,
-			// stringFA.length() - 2);
-			//
-			// String[] stateArray = stateList.split("\\{\"label\":");
-			//
-			// ArrayList<String> states = new ArrayList<>();
-			// Map<String, Map<String, ArrayList<String>>> stateTransitions =
-			// new HashMap<>();
-			//
-			// for (String state : stateArray) {
-			//
-			// String transitionsLbl = "\"transitions\":";
-			//
-			// if (state.contains(transitionsLbl)) {
-			// int transitionsPos = state.indexOf(transitionsLbl);
-			// int posAfterTransitions = transitionsPos +
-			// transitionsLbl.length();
-			//
-			// String initialStatelbl = "\"isInitialState\":";
-			// int initialPos = state.indexOf(initialStatelbl);
-			//
-			// String label = state.substring(0, transitionsPos);
-			// String transitions = state.substring(posAfterTransitions,
-			// initialPos - 1);
-			//
-			// label = label.replaceAll(",", "");
-			// label = label.replaceAll("\"", "");
-			//
-			// transitions = transitions.replaceAll("\\{", "");
-			// transitions = transitions.replaceAll("\\}", "");
-			//
-			// String[] transitionArray = transitions.split("\\],");
-			//
-			// Map<String, ArrayList<String>> transitionMap = new HashMap<>();
-			//
-			// for (String t : transitionArray) {
-			// String[] b = t.split(":");
-			//
-			// ArrayList<String> lbls = new ArrayList<>();
-			//
-			// if (b.length > 0) {
-			// String to = b[0];
-			// String lbl = b[1];
-			//
-			// to = to.replaceAll("\"", "");
-			// lbl = lbl.replaceAll("\\[\"", "");
-			// lbl = lbl.replaceAll("\"\\]", "");
-			// lbl = lbl.replaceAll("\"", "");
-			//
-			// if (lbl.contains(",")) {
-			// // means there is more than one label
-			// String[] labels = lbl.split(",");
-			//
-			// for (String l : labels) {
-			// lbls.add(l);
-			// }
-			// transitionMap.put(to, lbls);
-			//
-			// } else {
-			// // single transition
-			// lbls.add(lbl);
-			// transitionMap.put(to, lbls);
-			// }
-			// }
-			// }
-			// stateTransitions.put(label, transitionMap);
-			// states.add(label);
-			// }
-			// }
-			//
-			// DefaultTableModel tableModel = (DefaultTableModel)
-			// transitionTable.getModel();
-			// tableModel.setRowCount(0);
-			// tableModel.setColumnCount(0);
-			//
-			// Vector<String> columns = new Vector<String>();
-			// Vector<String> row = new Vector<String>();
-			//
-			// tableModel.setColumnCount(states.size() + 1);
-			// columns.add(" ");
-			//
-			// inputAlphabetStr = inputAlphabetStr.replaceAll("\\[", "");
-			// inputAlphabetStr = inputAlphabetStr.replaceAll("\\]", "");
-			//
-			// String[] alphabetLetters = inputAlphabetStr.split(",");
-			//
-			// txtInputAlphabet.setText("");
-			//
-			// for (String str : alphabetLetters) {
-			// str = str.replaceAll("\"", "");
-			// txtInputAlphabet.append(str + "\n");
-			//
-			// columns.add(str);
-			// }
-			// columns.add("ε");
-			//
-			// for (String state : states) {
-			//
-			// row.add(state);
-			// Map<String, ArrayList<String>> transitionMap =
-			// stateTransitions.get(state);
-			//
-			// for (int i = 1; i < columns.size(); i++) {
-			//
-			// String label = columns.get(i);
-			// String reachableStates = "";
-			//
-			// for (String stateTo : states) {
-			// ArrayList<String> transitionsLabels = transitionMap.get(stateTo);
-			//
-			// if (transitionsLabels == null) {
-			// reachableStates += " ";
-			// } else if (transitionsLabels.contains(label)) {
-			// reachableStates += stateTo + ", ";
-			// } else {
-			// reachableStates += " ";
-			// }
-			// }
-			//
-			// reachableStates = reachableStates.trim();
-			//
-			// if (reachableStates.contains(",")
-			// && reachableStates.lastIndexOf(",") == reachableStates.length() -
-			// 1) {
-			// reachableStates = reachableStates.substring(0,
-			// reachableStates.length() - 1);
-			// }
-			//
-			// row.addElement(reachableStates);
-			// }
-			//
-			// tableModel.addRow(row);
-			// row = new Vector<String>();
-			// }
-			// transitionTable.setModel(tableModel);
-			// tableModel.setColumnIdentifiers(columns);
-			//
-			// txtStates.setText("");
-			// finalStateList.removeAll();
-			//
-			// DefaultComboBoxModel<String> comboModel = new
-			// DefaultComboBoxModel<>();
-			// DefaultListModel<String> listModel = (DefaultListModel<String>)
-			// finalStateList.getModel();
-			// listModel.removeAllElements();
-			//
-			// for (String s : states) {
-			// txtStates.append(s + "\n");
-			// initialStateCombo.addItem(s);
-			// comboModel.addElement(s);
-			// listModel.addElement(s);
-			// }
-			// initialStateCombo.setModel(comboModel);
-			// initialStateCombo.setSelectedItem(initialState);
-			// finalStateList.setModel(listModel);
-		}
-
-		private ArrayList<String> splitIntoArrayList(String txtInput, String regex) {
-			String[] inputArray = txtInput.split(regex);
-
-			ArrayList<String> list = new ArrayList<>();
-			for (String input : inputArray) {
-				input = input.trim();
-
-				if (input.length() != 0) {
-					list.add(input);
-				}
-			}
-			return list;
-		}
-	}
-
-	class SaveListener implements ActionListener {
-
-		private JTabbedPane pane;
-
-		public SaveListener(JTabbedPane pane) {
-			this.pane = pane;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			int index = pane.getSelectedIndex();
-			Component tab = pane.getComponent(index);
-
-			String name = tab.getName();
-
-			if (name == "RegexToFA") {
-				System.out.println("got regex tab");
-
-				String fileName = JOptionPane.showInputDialog(frame, "Enter a name for the file", "Saving..",
-						JOptionPane.WARNING_MESSAGE);
-
-				if (fileName != null) {
-					rwu.writeToFile(txtRegex.getText(), fileName);
-				}
-
-			} else {
-				// FAToRegex
-				System.out.println("got fa tab");
-
-				if (faToConvert != null) {
-
-					String fileName = JOptionPane.showInputDialog(frame, "Enter a name for the file", "Saving..",
-							JOptionPane.WARNING_MESSAGE);
-
-					if (fileName != null) {
-						rwu.writeToFile(txtInputAlphabet.getText(), txtStates.getText(), transitionTable,
-								initialStateCombo.getSelectedIndex(), finalStateList.getSelectedIndices(), fileName);
-					}
-
-				} else {
-					String message = "Please click convert button to create FA, and then save";
-					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
-
-				}
-			}
-		}
-	}
-
+	/**
+	 * Handles the transition table. Updates the column and row headers based on
+	 * the input inside the states list and input alphabet list
+	 * 
+	 * @param transitionPanel
+	 *            - the panel the table is drawn on
+	 * @param txtStates
+	 *            - list of states as a string
+	 * @param txtInputAlphabet
+	 *            - input alphabet list as a string
+	 */
 	private void drawTable(JPanel transitionPanel, String txtStates, String txtInputAlphabet) {
 		DefaultTableModel model = (DefaultTableModel) transitionTable.getModel();
 
@@ -1078,6 +570,14 @@ public class Converter {
 		transitionPanel.repaint();
 	}
 
+	/**
+	 * Inner class which handles the functionality of the convert buttons on
+	 * both conversion windows. Allows all member variables of the outer class
+	 * to be accessed.
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
 	private class ConvertAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -1102,6 +602,10 @@ public class Converter {
 			}
 		}
 
+		/**
+		 * Draws the FA based on the user input. Performs validation to ensure
+		 * the input is legal, then converts the FA to a regex.
+		 */
 		private void drawAndConvertFA() {
 			// input alphabet
 			State initialState = null;
@@ -1165,7 +669,7 @@ public class Converter {
 
 											State stateTo = getState(stateLabel, states);
 											if (stateTo != null) {
-												// add tra sition from state to
+												// add transition from state to
 												// this state, with column
 												// header as the label
 												stateFrom.addTransition(stateTo, input);
@@ -1193,15 +697,21 @@ public class Converter {
 						throwError(message);
 					}
 				} else {
-					String message = "Enter states";
+					String message = "The list of states cannot be empty. Please enter some states.";
 					throwError(message);
 				}
 			} else {
-				String message = "Input alphabet cannot be empty";
+				String message = "The Input alphabet cannot be empty. Plesse enter some ";
 				throwError(message);
 			}
 		}
 
+		/**
+		 * 
+		 * @param label - label of the state object
+		 * @param states - list of states
+		 * @return the state object based on the label input
+		 */
 		private State getState(String label, ArrayList<State> states) {
 			for (State state : states) {
 				if (state.getLabel().equals(label)) {
@@ -1211,10 +721,19 @@ public class Converter {
 			return null;
 		}
 
+		/**
+		 * Throws an error based on some input message
+		 * @param message 
+		 */
 		private void throwError(String message) {
 			JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 
+		/**
+		 * Checks the validity of a list by ensuring it is not empty
+		 * @param list
+		 * @return
+		 */
 		private boolean validListInput(List<String> list) {
 			boolean valid = true;
 
@@ -1224,6 +743,11 @@ public class Converter {
 			return valid;
 		}
 
+		/**
+		 * Takes a string input, and splits it into an array list based on newlines
+		 * @param txtInput
+		 * @return the array list of the input
+		 */
 		private ArrayList<String> splitIntoArrayList(String txtInput) {
 			String[] inputArray = txtInput.split("\n");
 
@@ -1238,15 +762,379 @@ public class Converter {
 			return list;
 		}
 
-		private Finite_Automata createFA(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
+		/**
+		 * 
+		 * @param initialState
+		 * @param finalStates
+		 * @param states
+		 * @param inputAlphabet
+		 * @return a finite automaton object
+		 */
+		private Finite_Automaton createFA(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
 				ArrayList<String> inputAlphabet) {
-			return new Finite_Automata(initialState, finalStates, states, inputAlphabet);
+			return new Finite_Automaton(initialState, finalStates, states, inputAlphabet);
 		}
 
+		/**
+		 * Creates a state object based on the label input
+		 * @param label
+		 * @return the state
+		 */
 		private State createState(String label) {
 			return new State(label);
 		}
 
+	}
+
+	/**
+	 * Inner class which handles the functionality of the Open button. Allows
+	 * all member variables of the outer class to be accessed. Handles the
+	 * functionality for opening a regex and an FA, and loading the information
+	 * to the screen.
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
+	class OpenListener implements ActionListener {
+
+		private JTabbedPane pane;
+
+		public OpenListener(JTabbedPane pane) {
+			this.pane = pane;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			int index = pane.getSelectedIndex();
+			Component tab = pane.getComponent(index);
+
+			String name = tab.getName();
+
+			String workingDir = System.getProperty("user.dir");
+
+			if (name == "RegexToFA") {
+				// functionality for opening a regex file
+
+				boolean check = new File(workingDir, "Saved Regexs").exists();
+
+				if (check) {
+					// the folder exists
+
+					File dir = new File(workingDir, "Saved Regexs");
+
+					JFileChooser jfc = new JFileChooser(dir);
+					int returnValue = jfc.showOpenDialog(null);
+
+					if (returnValue == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = jfc.getSelectedFile();
+						String regex = rwu.ReadRegexFromFile(selectedFile.getName());
+
+						txtRegex.setText(regex);
+						faDiagramRegexPanel.resetPage();
+					}
+
+				} else {
+					// no regexes saved
+					String message = "No regexes stored.";
+					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+			} else {
+				// handles functionality for FAToRegex
+				boolean check = new File(workingDir, "Saved FAs").exists();
+
+				if (check) {
+					// the folder exists
+
+					File dir = new File(workingDir, "Saved FAs");
+
+					JFileChooser jfc = new JFileChooser(dir);
+					int returnValue = jfc.showOpenDialog(null);
+
+					if (returnValue == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = jfc.getSelectedFile();
+						String fa = rwu.ReadFAFromFile(selectedFile.getName());
+						convert(fa);
+						faDiagramFAPanel.resetPage();
+					}
+				} else {
+					// no saved FAs
+					String message = "No FAs stored";
+					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
+
+		/**
+		 * Takes the string read from a file and inputs the details into the
+		 * respective input boxes on the interface
+		 * 
+		 * @param stringFA
+		 *            - the file contents as a string
+		 */
+		private void convert(String stringFA) {
+
+			/**
+			 * file is in the format Input Alphabet:[a, b, c]
+			 * 
+			 * States:[6, 7, 8] Transitions:[6:a> 6 7, 7:b> 8, 8:c>6] Initial
+			 * State:6 Final State(s):[8]
+			 * 
+			 */
+
+			String lblInputAlph = "Input Alphabet:[";
+			int lblInputAlphStart = stringFA.indexOf(lblInputAlph);
+			int lblInputAlphEnd = lblInputAlphStart + lblInputAlph.length();
+
+			String inputAlphString = stringFA.substring(lblInputAlphEnd, stringFA.indexOf("]"));
+
+			String tmpStringFA = stringFA.substring(stringFA.indexOf("]") + 1, stringFA.length());
+
+			String lblStates = "States:[";
+			int lblStatesStart = tmpStringFA.indexOf(lblStates);
+			int lblStatesEnd = lblStatesStart + lblStates.length();
+
+			String statesString = tmpStringFA.substring(lblStatesEnd, tmpStringFA.indexOf("]"));
+			ArrayList<String> states = splitIntoArrayList(statesString, ",");
+
+			tmpStringFA = tmpStringFA.substring(tmpStringFA.indexOf("]") + 1, tmpStringFA.length());
+
+			String lblTransitions = "Transitions:[";
+			int lblTransitionsStart = tmpStringFA.indexOf(lblTransitions);
+			int lblTransitionsEnd = lblTransitionsStart + lblTransitions.length();
+
+			String transitionList = tmpStringFA.substring(lblTransitionsEnd, tmpStringFA.indexOf("]"));
+			ArrayList<String> transitions = splitIntoArrayList(transitionList, ",");
+
+			tmpStringFA = tmpStringFA.substring(tmpStringFA.indexOf("]") + 1, tmpStringFA.length());
+
+			// transitions stored in the format 1:a>2
+			Map<String, Map<String, ArrayList<String>>> transitionMap = new HashMap<>();
+
+			for (String transition : transitions) {
+				String from = transition.substring(0, transition.indexOf(":"));
+
+				if (transitionMap.containsKey(from)) {
+
+					Map<String, ArrayList<String>> inputStates = transitionMap.get(from);
+
+					String input = transition.substring(transition.indexOf(":") + 1, transition.indexOf(">"));
+					String stateList = transition.substring(transition.indexOf(">") + 1, transition.length());
+					stateList = stateList.replace("  ", " ");
+					// remove double spaces - occurs when comma is rpelaced by a
+					// space
+
+					ArrayList<String> reachableStates = splitIntoArrayList(stateList, " ");
+
+					inputStates.put(input, reachableStates);
+
+				} else {
+
+					Map<String, ArrayList<String>> inputStates = new HashMap<>();
+
+					String input = transition.substring(transition.indexOf(":") + 1, transition.indexOf(">"));
+					String stateList = transition.substring(transition.indexOf(">") + 1, transition.length());
+
+					stateList = stateList.replace("  ", " ");
+					// remove double spaces - occurs when comma is replaced by a
+					// space
+
+					ArrayList<String> reachableStates = splitIntoArrayList(stateList, " ");
+					// System.out.println("\tReachable states from " + from + "
+					// are: " + reachableStates);
+
+					inputStates.put(input, reachableStates);
+					transitionMap.put(from, inputStates);
+				}
+			}
+
+			String lblInitialState = "Initial State:";
+			int lblInitialStateStart = tmpStringFA.indexOf(lblInitialState);
+			int lblInitialStateEnd = lblInitialStateStart + lblInitialState.length();
+
+			String initialState = tmpStringFA.substring(lblInitialStateEnd, tmpStringFA.indexOf("Final"));
+
+			String lblFinalStates = "Final State(s):[";
+			int lblFinalStatesStart = tmpStringFA.indexOf(lblFinalStates);
+			int lblFinalStatesEnd = lblFinalStatesStart + lblFinalStates.length();
+
+			String finalStatesString = tmpStringFA.substring(lblFinalStatesEnd, tmpStringFA.indexOf("]"));
+			// System.out.println("final states: " + finalStatesString);
+			// set as selected item in list
+
+			ArrayList<String> finalStates = splitIntoArrayList(finalStatesString, ",");
+			int[] finalStateIndices = new int[finalStates.size()];
+
+			int indicesCount = 0;
+
+			for (int i = 0; i < states.size(); i++) {
+				String state = states.get(i);
+
+				if (finalStates.contains(state)) {
+					finalStateIndices[indicesCount] = i;
+					indicesCount++;
+				}
+			}
+
+			DefaultTableModel tableModel = (DefaultTableModel) transitionTable.getModel();
+			tableModel.setRowCount(0);
+			tableModel.setColumnCount(0);
+
+			Vector<String> columns = new Vector<String>();
+			Vector<String> row = new Vector<String>();
+
+			tableModel.setColumnCount(states.size() + 1);
+			columns.add(" ");
+
+			String[] alphabet = inputAlphString.split(",");
+
+			txtInputAlphabet.setText("");
+
+			for (String str : alphabet) {
+				str = str.trim();
+				txtInputAlphabet.append(str + "\n");
+				columns.add(str);
+			}
+			columns.add("ε");
+
+			txtStates.setText("");
+			finalStateList.removeAll();
+
+			DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<>();
+			DefaultListModel<String> listModel = (DefaultListModel<String>) finalStateList.getModel();
+			listModel.removeAllElements();
+
+			for (String s : states) {
+				txtStates.append(s + "\n");
+				initialStateCombo.addItem(s);
+				comboModel.addElement(s);
+				listModel.addElement(s);
+
+				row.addElement(s);
+
+				Map<String, ArrayList<String>> inputStates = transitionMap.get(s);
+
+				for (String input : alphabet) {
+					input = input.trim();
+
+					if (inputStates.containsKey(input)) {
+
+						ArrayList<String> statesTo = inputStates.get(input);
+						if (!statesTo.isEmpty()) {
+							// System.out.println("With state " + s + " the
+							// reachable states are: " + statesTo);
+
+							String stateList = "";
+							for (String to : statesTo) {
+								stateList += to + ", ";
+							}
+							stateList = stateList.substring(0, stateList.lastIndexOf(","));
+
+							row.addElement(stateList);
+						} else {
+							row.addElement("");
+						}
+
+					} else {
+						// System.out.println("No reachable states for state " +
+						// s + "with input " + input);
+						row.addElement("");
+					}
+				}
+				// System.out.println("Adding row: " + row);
+				tableModel.addRow(row);
+				row = new Vector<String>();
+
+			}
+
+			transitionTable.setModel(tableModel);
+			tableModel.setColumnIdentifiers(columns);
+
+			initialStateCombo.setModel(comboModel);
+			initialStateCombo.setSelectedItem(initialState);
+			finalStateList.setModel(listModel);
+			finalStateList.setSelectedIndices(finalStateIndices);
+		}
+
+		private ArrayList<String> splitIntoArrayList(String txtInput, String regex) {
+			String[] inputArray = txtInput.split(regex);
+
+			ArrayList<String> list = new ArrayList<>();
+			for (String input : inputArray) {
+				input = input.trim();
+
+				if (input.length() != 0) {
+					list.add(input);
+				}
+			}
+			return list;
+		}
+	}
+
+	/**
+	 * Inner class which handles the functionality of the Save button. Allows
+	 * all member variables of the outer class to be accessed. Handles
+	 * functionality for saving regexes and FAs.
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
+	class SaveListener implements ActionListener {
+
+		private JTabbedPane pane;
+
+		public SaveListener(JTabbedPane pane) {
+			this.pane = pane;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			int index = pane.getSelectedIndex();
+			Component tab = pane.getComponent(index);
+
+			String name = tab.getName();
+
+			if (name == "RegexToFA") {
+				// functionality for saving a regex
+
+				System.out.println("got regex tab");
+
+				if (txtRegex.getText().length() > 0) {
+
+					String fileName = JOptionPane.showInputDialog(frame, "Enter a name for the file", "Saving..",
+							JOptionPane.WARNING_MESSAGE);
+
+					if (fileName != null) {
+						rwu.writeToFile(txtRegex.getText(), fileName);
+					}
+				} else {
+					String message = "Please enter a regex to save";
+					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+			} else {
+				// FAToRegex - functionality for saving an FA
+				System.out.println("got fa tab");
+
+				if (faToConvert != null) {
+
+					String fileName = JOptionPane.showInputDialog(frame, "Enter a name for the file", "Saving..",
+							JOptionPane.WARNING_MESSAGE);
+
+					if (fileName != null) {
+						rwu.writeToFile(txtInputAlphabet.getText(), txtStates.getText(), transitionTable,
+								initialStateCombo.getSelectedIndex(), finalStateList.getSelectedIndices(), fileName);
+					}
+
+				} else {
+					String message = "Please click convert button to create FA, and then save";
+					JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+
+				}
+			}
+		}
 	}
 
 }

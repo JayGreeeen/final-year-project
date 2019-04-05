@@ -11,9 +11,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import toolbox.FA_Dimension;
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
 
+/**
+ * Class to draw the finite automata to the screen. Based on and inspired by the
+ * 'CurvedArrow' class from the software JFLAP, http://www.jflap.org/
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class FA_Drawer {
 
 	private Graphics g;
@@ -30,26 +37,38 @@ public class FA_Drawer {
 
 	public void setGraphics(Graphics g) {
 		this.g = g;
-		// this.g.setFont(new Font("TimesRoman", Font.BOLD, 15));
 	}
 
+	/**
+	 * Sets the centre position of the first state in the FA
+	 * 
+	 * @param xpos
+	 * @param ypos
+	 */
 	public void setCentre(int xpos, int ypos) {
-//		System.out.println("resetting centre to: " + xpos + ", " + ypos);
 		centrex = xpos;
 		centrey = ypos;
 	}
 
+	/**
+	 * Sets the spacing between states
+	 * 
+	 * @param spacing
+	 */
 	public void setSpacing(int spacing) {
 		this.spacing = spacing;
 	}
 
-	public void drawFA(Finite_Automata fa) {
-//		System.out.println("drawing FA with centre: " + centrex + ", " + centrey);
+	/**
+	 * Draws the FA based on the transitions between states
+	 * 
+	 * @param fa
+	 */
+	public void drawFA(Finite_Automaton fa) {
 		faDimension = new FA_Dimension();
 		faDimension.setYPos(centrey);
 
 		ArrayList<State> stateList = fa.getStates();
-		// g.setFont(new Font("TimesRoman", Font.BOLD, 15));
 		Map<State, State_Centre> statePositions = drawStates(g, stateList);
 
 		for (State start : statePositions.keySet()) {
@@ -81,9 +100,16 @@ public class FA_Drawer {
 		}
 	}
 
+	/**
+	 * Takes the list of states and draws them to the screen
+	 * 
+	 * @param g
+	 *            - graphics
+	 * @param states
+	 *            - list of states to draw
+	 * @return the map of the state object and its centre position on the screen
+	 */
 	private Map<State, State_Centre> drawStates(Graphics g, ArrayList<State> states) {
-		// where to draw the states
-
 		Map<State, State_Centre> statePositions = new HashMap<State, State_Centre>();
 
 		for (State state : states) {
@@ -96,6 +122,14 @@ public class FA_Drawer {
 		return statePositions;
 	}
 
+	/**
+	 * Draws each individual state on the screen with its label
+	 * 
+	 * @param g
+	 * @param xCentre
+	 * @param yCentre
+	 * @param state
+	 */
 	private void drawState(Graphics g, int xCentre, int yCentre, State state) {
 		String label = state.getLabel();
 
@@ -131,12 +165,19 @@ public class FA_Drawer {
 			g.drawOval(xCentre - radius, yCentre - radius, 2 * radius, 2 * radius);
 		}
 		if (state.isInitialState()) {
-			drawInitialArrow(g, xCentre, yCentre, label);
+			drawInitialArrow(g, xCentre, yCentre);
 		}
 		g.setFont(new Font("TimesRoman", Font.PLAIN, 15));
 	}
 
-	private void drawInitialArrow(Graphics g, int xCentre, int yCentre, String label) {
+	/**
+	 * Draws an arrow pointing to the initial state of the FA
+	 * 
+	 * @param g
+	 * @param xCentre
+	 * @param yCentre
+	 */
+	private void drawInitialArrow(Graphics g, int xCentre, int yCentre) {
 		int endx, endy;
 		int startx = xCentre - 25;
 		int starty = yCentre;
@@ -157,6 +198,23 @@ public class FA_Drawer {
 		g.drawLine((int) startx, (int) starty, endx, endy);
 	}
 
+	/**
+	 * Takes the list of transitions between two states and draws them to the
+	 * screen. Will have different height and curve depending on the number of
+	 * transitions
+	 * 
+	 * @param start
+	 *            - state the transition leaves
+	 * @param end
+	 *            - state the transition points to
+	 * @param labels
+	 *            - labels on the transitions
+	 * @param nextTo
+	 *            - boolean stating whether the states are next to each other
+	 * @param backwardsTransition
+	 *            - boolean stating whether the transition goes to a previously
+	 *            seen state
+	 */
 	private void drawTransitions(State_Centre start, State_Centre end, ArrayList<String> labels, boolean nextTo,
 			boolean backwardsTransition) {
 		int numLabels = labels.size();
@@ -179,7 +237,7 @@ public class FA_Drawer {
 					if (i == 0) {
 						drawSlightCurveTransition(g, start, end, labels.get(i), curveUp);
 					} else {
-						
+
 						drawTransition(g, start, end, curve * height, labels.get(i));
 						height += 30;
 					}
@@ -189,15 +247,12 @@ public class FA_Drawer {
 		} else {
 			height = 40;
 
-			// find out how far apart they are
-			// use this as a factor for the distance
-
 			int startX = start.getXPos();
 			int endX = end.getXPos();
 			int dist;
 
 			if (backwardsTransition) {
-				curve = 1; // curve down
+				curve = 1; // curve down the page
 				dist = startX - endX;
 			} else {
 				dist = endX - startX;
@@ -212,6 +267,21 @@ public class FA_Drawer {
 		}
 	}
 
+	/**
+	 * Draws a slightly curved transition between two states. Used if states are
+	 * next to each other
+	 * 
+	 * @param g
+	 * @param start
+	 *            - state transition leaves from
+	 * @param end
+	 *            - state transition points to
+	 * @param label
+	 *            - label on the transition
+	 * @param curveUp
+	 *            - whether it should curve up the page (forwards arrow) or down
+	 *            the page (backwards arrow)
+	 */
 	private void drawSlightCurveTransition(Graphics g, State_Centre start, State_Centre end, String label,
 			boolean curveUp) {
 
@@ -256,6 +326,17 @@ public class FA_Drawer {
 		createArrow(g, startx, starty, endx, endy, control, label);
 	}
 
+	/**
+	 * Draws a straight transition between states
+	 * 
+	 * @param g
+	 * @param start
+	 *            - state transition leaves from
+	 * @param end
+	 *            - state transition points to
+	 * @param label
+	 *            - label on the transition
+	 */
 	private void drawStraightTransition(Graphics g, State_Centre start, State_Centre end, String label) {
 		double startx;
 		double starty;
@@ -280,12 +361,24 @@ public class FA_Drawer {
 		double midpoint = (startx + endx) / 2;
 		double controlx = midpoint;
 		double controly = starty;
-		// *************** previously set to the value of midpoint
 
 		Point2D control = new Point2D.Double(controlx, controly);
 		createArrow(g, startx, starty, endx, endy, control, label);
 	}
 
+	/**
+	 * Determines the positioning of the transition on the screen
+	 * 
+	 * @param g
+	 * @param start
+	 *            - state the transition leaves from
+	 * @param end
+	 *            - state the transition points to
+	 * @param curve
+	 *            - whether the transition goes up or down the page
+	 * @param label
+	 *            - label on the transition
+	 */
 	private void drawTransition(Graphics g, State_Centre start, State_Centre end, int curve, String label) {
 		double startx = start.getXPos();
 		double starty = start.getYPos();
@@ -295,7 +388,6 @@ public class FA_Drawer {
 		if (start == end) {
 			startx -= 15;
 			endx += 15;
-			// curve = -50;
 		}
 
 		if (curve > 0) {
@@ -305,7 +397,7 @@ public class FA_Drawer {
 
 			int h = (int) ((starty + starty + curve - 5) / 2);
 			faDimension.setBackTransitionHeight(h);
-			
+
 		} else {
 			starty -= (circle_radius + 5);
 			endy -= (circle_radius + 5);
@@ -318,11 +410,29 @@ public class FA_Drawer {
 		double midpoint = (startx + endx) / 2;
 		double controlx = midpoint;
 		double controly = starty + curve;
-		
+
 		Point2D control = new Point2D.Double(controlx, controly);
 		createArrow(g, startx, starty, endx, endy, control, label);
 	}
 
+	/**
+	 * Draws the transition to the screen
+	 * 
+	 * @param g
+	 * @param startx
+	 *            - start x position
+	 * @param starty
+	 *            - start y position
+	 * @param endx
+	 *            - end x position
+	 * @param endy
+	 *            - end y position
+	 * @param control
+	 *            - control point of the curve. Determines the curvey-ness of
+	 *            the transition and is the point the arrow head faces away from
+	 * @param label
+	 *            - the label on the transition
+	 */
 	private void createArrow(Graphics g, double startx, double starty, double endx, double endy, Point2D control,
 			String label) {
 		Point2D endPosArrow = new Point2D.Double(endx, endy);
@@ -331,15 +441,21 @@ public class FA_Drawer {
 
 		Graphics2D g2d = (Graphics2D) g;
 
-		// makes the line thicker
-		// Stroke stroke = new BasicStroke(2f);
-		// g2d.setStroke(stroke);
-
 		g2d.draw(arrow);
 		drawArrow(g2d, endPosArrow, control);
 		drawLabel(g, arrow, label);
 	}
 
+	/**
+	 * Draws the arrow-head lines to the screen
+	 * 
+	 * @param g
+	 * @param head
+	 *            - position of the head of the arrow
+	 * @param control
+	 *            - the control point of the curve. Arrow head faces away from
+	 *            this
+	 */
 	private void drawArrow(Graphics g, Point2D head, Point2D control) {
 		int endX, endY;
 		double angle = Math.atan2((double) (control.getX() - head.getX()), (double) (control.getY() - head.getY()));
@@ -357,15 +473,14 @@ public class FA_Drawer {
 		g.drawLine((int) head.getX(), (int) head.getY(), endX, endY);
 	}
 
+	/**
+	 * Draws the label on the transition arrow
+	 * @param g
+	 * @param arrow - the transition to draw the label on
+	 * @param label - the label on the transition
+	 */
 	private void drawLabel(Graphics g, QuadCurve2D arrow, String label) {
-
 		int width = g.getFontMetrics().stringWidth(label);
-
-		// double startx = arrow.getX1();
-		// double endx = arrow.getX2();
-
-		// double length = endx - startx;
-		// if (length > )
 
 		int x = (int) arrow.getCtrlX();
 		int y = (int) (arrow.getY1() + arrow.getCtrlY() - 5) / 2;
@@ -373,12 +488,14 @@ public class FA_Drawer {
 		int pos = x - (width / 2);
 
 		g.drawString(label, pos, (int) y);
-		// g.drawString(label, x, (int) y);
 	}
 
+	/**
+	 *
+	 * @return the dimensions of the FA - the height, width, etc
+	 */
 	public FA_Dimension getDimension() {
 		return faDimension;
 	}
 
 }
-
