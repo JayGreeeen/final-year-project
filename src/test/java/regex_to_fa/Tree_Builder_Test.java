@@ -9,10 +9,10 @@ import static org.junit.Assert.assertTrue;
 
 import toolbox.Print_Tree;
 import toolbox.Tree_Node;
-import toolbox.Tree_Node.ConcatNode;
-import toolbox.Tree_Node.LeafNode;
-import toolbox.Tree_Node.StarNode;
-import toolbox.Tree_Node.UnionNode;
+import toolbox.Tree_Node.Concat_Node;
+import toolbox.Tree_Node.Leaf_Node;
+import toolbox.Tree_Node.Star_Node;
+import toolbox.Tree_Node.Union_Node;
 
 public class Tree_Builder_Test {
 	private Tree_Builder builder;
@@ -27,7 +27,7 @@ public class Tree_Builder_Test {
 		builder = new Tree_Builder(regex);
 		Tree_Node root = builder.buildTree();
 
-		assertTrue(root instanceof LeafNode);
+		assertTrue(root instanceof Leaf_Node);
 		assertTrue(root.getChildCount() == 0);
 	}
 
@@ -46,7 +46,7 @@ public class Tree_Builder_Test {
 		String leftChild = "a";
 		String rightChild = "b";
 
-		assertTrue(root instanceof ConcatNode);
+		assertTrue(root instanceof Concat_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(leftChild, root.getLeftChild().getText());
 		assertEquals(rightChild, root.getRightChild().getText());
@@ -67,7 +67,7 @@ public class Tree_Builder_Test {
 		String leftChild = "a";
 		String rightChild = "b";
 
-		assertTrue(root instanceof UnionNode);
+		assertTrue(root instanceof Union_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(leftChild, root.getLeftChild().getText());
 		assertEquals(rightChild, root.getRightChild().getText());
@@ -87,7 +87,7 @@ public class Tree_Builder_Test {
 
 		String leftChild = "a";
 
-		assertTrue(root instanceof StarNode);
+		assertTrue(root instanceof Star_Node);
 		assertTrue(root.getChildCount() == 1);
 		assertEquals(leftChild, root.getLeftChild().getText());
 	}
@@ -102,7 +102,7 @@ public class Tree_Builder_Test {
 		builder = new Tree_Builder(regex);
 		Tree_Node root = builder.buildTree();
 
-		assertTrue(root instanceof LeafNode);
+		assertTrue(root instanceof Leaf_Node);
 		assertTrue(root.getChildCount() == 0);
 	}
 
@@ -121,7 +121,7 @@ public class Tree_Builder_Test {
 		String leftChild = "a";
 		String rightChild = "b";
 
-		assertTrue(root instanceof UnionNode);
+		assertTrue(root instanceof Union_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(leftChild, root.getLeftChild().getText());
 		assertEquals(rightChild, root.getRightChild().getText());
@@ -142,7 +142,7 @@ public class Tree_Builder_Test {
 		String leftChild = "a";
 		String rightChild = "b";
 
-		assertTrue(root instanceof ConcatNode);
+		assertTrue(root instanceof Concat_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(leftChild, root.getLeftChild().getText());
 		assertEquals(rightChild, root.getRightChild().getText());
@@ -163,7 +163,7 @@ public class Tree_Builder_Test {
 
 		String leftChild = "a";
 
-		assertTrue(root instanceof StarNode);
+		assertTrue(root instanceof Star_Node);
 		assertTrue(root.getChildCount() == 1);
 		assertEquals(leftChild, root.getLeftChild().getText());
 
@@ -188,16 +188,16 @@ public class Tree_Builder_Test {
 		String label1 = "a";
 		String label2 = "b";
 
-		assertTrue(root instanceof ConcatNode);
+		assertTrue(root instanceof Concat_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(label1, root.getRightChild().getText());
 
 		Tree_Node leftChild = root.getLeftChild();
-		assertTrue(leftChild instanceof StarNode);
+		assertTrue(leftChild instanceof Star_Node);
 		assertTrue(leftChild.getChildCount() == 1);
 
 		Tree_Node childOfStar = leftChild.getLeftChild();
-		assertTrue(childOfStar instanceof UnionNode);
+		assertTrue(childOfStar instanceof Union_Node);
 		assertTrue(childOfStar.getChildCount() == 2);
 		assertEquals(label1, childOfStar.getLeftChild().getText());
 		assertEquals(label2, childOfStar.getRightChild().getText());
@@ -220,12 +220,12 @@ public class Tree_Builder_Test {
 		String label1 = "a";
 		String label2 = "b";
 
-		assertTrue(root instanceof ConcatNode);
+		assertTrue(root instanceof Concat_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(label2, root.getRightChild().getText());
 
 		Tree_Node leftChild = root.getLeftChild();
-		assertTrue(leftChild instanceof StarNode);
+		assertTrue(leftChild instanceof Star_Node);
 		assertTrue(leftChild.getChildCount() == 1);
 		assertEquals(label1, leftChild.getLeftChild().getText());
 	}
@@ -247,12 +247,12 @@ public class Tree_Builder_Test {
 		String label1 = "a";
 		String label2 = "b";
 
-		assertTrue(root instanceof ConcatNode);
+		assertTrue(root instanceof Concat_Node);
 		assertTrue(root.getChildCount() == 2);
 		assertEquals(label1, root.getRightChild().getText());
 
 		Tree_Node leftChild = root.getLeftChild();
-		assertTrue(leftChild instanceof UnionNode);
+		assertTrue(leftChild instanceof Union_Node);
 		assertTrue(leftChild.getChildCount() == 2);
 		assertEquals(label1, leftChild.getLeftChild().getText());
 		assertEquals(label2, leftChild.getRightChild().getText());
@@ -275,11 +275,11 @@ public class Tree_Builder_Test {
 		String label1 = "a";
 		String label2 = "b";
 
-		assertTrue(root instanceof StarNode);
+		assertTrue(root instanceof Star_Node);
 		assertTrue(root.getChildCount() == 1);
 
 		Tree_Node leftChild = root.getLeftChild();
-		assertTrue(leftChild instanceof ConcatNode);
+		assertTrue(leftChild instanceof Concat_Node);
 		assertTrue(leftChild.getChildCount() == 2);
 		assertEquals(label1, leftChild.getLeftChild().getText());
 		assertEquals(label2, leftChild.getRightChild().getText());
@@ -304,19 +304,19 @@ public class Tree_Builder_Test {
 		String label1 = "a";
 		String label2 = "b";
 
-		assertTrue(root instanceof ConcatNode);
+		assertTrue(root instanceof Concat_Node);
 		assertTrue(root.getChildCount() == 2);
 
 		Tree_Node leftChild = root.getLeftChild();
-		assertTrue(leftChild instanceof StarNode);
+		assertTrue(leftChild instanceof Star_Node);
 
 		Tree_Node childOfStar = leftChild.getLeftChild();
-		assertTrue(childOfStar instanceof ConcatNode);
+		assertTrue(childOfStar instanceof Concat_Node);
 		assertEquals(label1, childOfStar.getLeftChild().getText());
 		assertEquals(label2, childOfStar.getRightChild().getText());
 
 		Tree_Node rightChild = root.getRightChild();
-		assertTrue(rightChild instanceof StarNode);
+		assertTrue(rightChild instanceof Star_Node);
 		assertEquals(label1, rightChild.getLeftChild().getText());
 	}
 
@@ -345,40 +345,40 @@ public class Tree_Builder_Test {
 		String label2 = "b";
 		String label3 = "c";
 
-		assertTrue(root instanceof UnionNode);
+		assertTrue(root instanceof Union_Node);
 		assertTrue(root.getChildCount() == 2);
 
 		// left child of root
 		Tree_Node leftChildRoot = root.getLeftChild(); // •
-		assertTrue(leftChildRoot instanceof ConcatNode);
+		assertTrue(leftChildRoot instanceof Concat_Node);
 		assertTrue(leftChildRoot.getChildCount() == 2);
 		assertEquals(label1, leftChildRoot.getLeftChild().getText()); // a
 
 		Tree_Node rightChild = leftChildRoot.getRightChild(); // •
-		assertTrue(rightChild instanceof ConcatNode);
+		assertTrue(rightChild instanceof Concat_Node);
 		assertTrue(rightChild.getChildCount() == 2);
 		assertEquals(label2, rightChild.getLeftChild().getText()); // b
 
 		rightChild = rightChild.getRightChild(); // *
-		assertTrue(rightChild instanceof StarNode);
+		assertTrue(rightChild instanceof Star_Node);
 		assertEquals(label3, rightChild.getLeftChild().getText()); // c
 
 		// right child of root
 		Tree_Node rightChildRoot = root.getRightChild(); // •
-		assertTrue(rightChildRoot instanceof ConcatNode);
+		assertTrue(rightChildRoot instanceof Concat_Node);
 		assertTrue(rightChildRoot.getChildCount() == 2);
 
 		Tree_Node leftChild = rightChildRoot.getLeftChild(); // *
-		assertTrue(leftChild instanceof StarNode);
+		assertTrue(leftChild instanceof Star_Node);
 
 		leftChild = leftChild.getLeftChild(); // •
-		assertTrue(leftChild instanceof ConcatNode);
+		assertTrue(leftChild instanceof Concat_Node);
 		assertTrue(leftChild.getChildCount() == 2);
 		assertEquals(label1, leftChild.getLeftChild().getText()); // a
 		assertEquals(label2, leftChild.getRightChild().getText()); // b
 
 		rightChild = rightChildRoot.getRightChild(); // *
-		assertTrue(rightChild instanceof StarNode);
+		assertTrue(rightChild instanceof Star_Node);
 		assertEquals(label1, rightChild.getLeftChild().getText()); // a
 	}
 

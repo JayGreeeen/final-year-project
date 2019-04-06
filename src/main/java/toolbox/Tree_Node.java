@@ -24,14 +24,14 @@ public interface Tree_Node {
 
 	public String toString();
 
-	public class ConcatNode implements Tree_Node {
+	public class Concat_Node implements Tree_Node {
 		private Tree_Node parent;
 		private String text;
 		private Tree_Node leftChild;
 		private Tree_Node rightChild;
 		private int childCount = 0;
 
-		public ConcatNode(Tree_Node parent) {
+		public Concat_Node(Tree_Node parent) {
 			text = "•";
 			this.parent = parent;
 		}
@@ -94,14 +94,14 @@ public interface Tree_Node {
 
 	}
 
-	public class StarNode implements Tree_Node {
+	public class Star_Node implements Tree_Node {
 
 		private Tree_Node parent;
 		private String text;
 		private Tree_Node child;
 		private int childCount = 0;
 
-		public StarNode(Tree_Node parent) {
+		public Star_Node(Tree_Node parent) {
 			text = "*";
 			this.parent = parent;
 		}
@@ -163,12 +163,12 @@ public interface Tree_Node {
 
 	}
 
-	public class LeafNode implements Tree_Node {
+	public class Leaf_Node implements Tree_Node {
 
 		private Tree_Node parent;
 		private String text;
 
-		public LeafNode(String text) {
+		public Leaf_Node(String text) {
 			this.text = text;
 			// this.parent = parent;
 		}
@@ -222,7 +222,7 @@ public interface Tree_Node {
 
 	}
 
-	public class UnionNode implements Tree_Node {
+	public class Union_Node implements Tree_Node {
 
 		private Tree_Node parent;
 		private Tree_Node leftChild;
@@ -230,7 +230,7 @@ public interface Tree_Node {
 		private int childCount;
 		private String text;
 
-		public UnionNode() {
+		public Union_Node() {
 			text = "|";
 		}
 

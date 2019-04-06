@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import toolbox.Finite_Automaton;
 import toolbox.State;
-import toolbox.Tree_Node.LeafNode;
+import toolbox.Tree_Node.Leaf_Node;
 
 public class Automaton_Builder {
 
@@ -15,7 +15,7 @@ public class Automaton_Builder {
 
 	// create basic automaton for a leaf node - single transition
 	// initial state -- node text --> final state
-	public Finite_Automaton buildSimpleAutomaton(LeafNode node) {
+	public Finite_Automaton buildSimpleAutomaton(Leaf_Node node) {
 		String label = node.getText();
 
 		// initial state

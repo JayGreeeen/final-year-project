@@ -95,7 +95,7 @@ public class Tree_Builder {
 				if (closingBracketPosition != -1) {
 
 					Tree_Node parent = getCurrentParent();
-					if (parent instanceof Tree_Node.ConcatNode) {
+					if (parent instanceof Tree_Node.Concat_Node) {
 						/*-
 						 * put a new union node between the concat node and its left child
 						 * 	 • 		  •
@@ -107,7 +107,7 @@ public class Tree_Builder {
 						 */
 
 						Tree_Node leftChild = parent.getLeftChild();
-						Tree_Node unionNode = new Tree_Node.UnionNode();
+						Tree_Node unionNode = new Tree_Node.Union_Node();
 						parentStack.push(unionNode);
 						unionNode.addChild(leftChild);
 						leftChild.setParent(unionNode);
@@ -137,7 +137,7 @@ public class Tree_Builder {
 					 *  b			b
 					 */
 
-					Tree_Node unionNode = new Tree_Node.UnionNode();
+					Tree_Node unionNode = new Tree_Node.Union_Node();
 					unionNode.addChild(root);
 					root.setParent(unionNode);
 					root = unionNode;
@@ -226,11 +226,11 @@ public class Tree_Builder {
 	private void addConcatNode() {
 		Tree_Node concatNode;
 		if (root == null) {
-			concatNode = new Tree_Node.ConcatNode(null);
+			concatNode = new Tree_Node.Concat_Node(null);
 			root = concatNode;
 		} else {
 			Tree_Node parent = getCurrentParent();
-			concatNode = new Tree_Node.ConcatNode(parent);
+			concatNode = new Tree_Node.Concat_Node(parent);
 
 			addChildToParent(concatNode);
 		}
@@ -243,11 +243,11 @@ public class Tree_Builder {
 	private void addStarNode() {
 		Tree_Node starNode;
 		if (root == null) {
-			starNode = new Tree_Node.StarNode(null);
+			starNode = new Tree_Node.Star_Node(null);
 			root = starNode;
 		} else {
 			Tree_Node parent = getCurrentParent();
-			starNode = new Tree_Node.StarNode(parent);
+			starNode = new Tree_Node.Star_Node(parent);
 
 			addChildToParent(starNode);
 		}
@@ -272,7 +272,7 @@ public class Tree_Builder {
 	 *            - the char of the child node
 	 */
 	private void addLeafToParent(char c) {
-		addChildToParent(new Tree_Node.LeafNode(Character.toString(c)));
+		addChildToParent(new Tree_Node.Leaf_Node(Character.toString(c)));
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class Tree_Builder {
 			parent.addChild(child);
 			child.setParent(parent);
 
-			if (parent instanceof Tree_Node.StarNode && parent.getChildCount() == 1) {
+			if (parent instanceof Tree_Node.Star_Node && parent.getChildCount() == 1) {
 				Tree_Node prevParent = parentStack.pop();
 
 			} else if (parent.getChildCount() == 2) {

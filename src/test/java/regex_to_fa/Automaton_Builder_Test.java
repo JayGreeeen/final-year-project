@@ -32,7 +32,7 @@ public class Automaton_Builder_Test {
 		inputAlphabet.add(label);
 		int stateCount = 2;
 
-		Tree_Node.LeafNode node = new Tree_Node.LeafNode(label);
+		Tree_Node.Leaf_Node node = new Tree_Node.Leaf_Node(label);
 
 		Finite_Automaton actual = builder.buildSimpleAutomaton(node);
 		
@@ -63,8 +63,8 @@ public class Automaton_Builder_Test {
 		 */
 		String label1 = "a";
 		String label2 = "b";
-		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
-		Tree_Node.LeafNode node2 = new Tree_Node.LeafNode(label2);
+		Tree_Node.Leaf_Node node1 = new Tree_Node.Leaf_Node(label1);
+		Tree_Node.Leaf_Node node2 = new Tree_Node.Leaf_Node(label2);
 		
 		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
 		Finite_Automaton FA2 = builder.buildSimpleAutomaton(node2);
@@ -115,8 +115,8 @@ public class Automaton_Builder_Test {
 		 */
 		String label1 = "a";
 		String label2 = "b";
-		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
-		Tree_Node.LeafNode node2 = new Tree_Node.LeafNode(label2);
+		Tree_Node.Leaf_Node node1 = new Tree_Node.Leaf_Node(label1);
+		Tree_Node.Leaf_Node node2 = new Tree_Node.Leaf_Node(label2);
 		
 		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
 		Finite_Automaton FA2 = builder.buildSimpleAutomaton(node2);
@@ -169,7 +169,7 @@ public class Automaton_Builder_Test {
 		String label1 = "a";
 		inputAlphabet.add(label1);
 		
-		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
+		Tree_Node.Leaf_Node node1 = new Tree_Node.Leaf_Node(label1);
 		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
 		Finite_Automaton actual = builder.addStarOperator(FA1);
 		
@@ -236,8 +236,8 @@ public class Automaton_Builder_Test {
 		inputAlphabet.add(label1);
 		inputAlphabet.add(label2);
 		
-		Tree_Node.LeafNode node1 = new Tree_Node.LeafNode(label1);
-		Tree_Node.LeafNode node2 = new Tree_Node.LeafNode(label2);
+		Tree_Node.Leaf_Node node1 = new Tree_Node.Leaf_Node(label1);
+		Tree_Node.Leaf_Node node2 = new Tree_Node.Leaf_Node(label2);
 		
 		Finite_Automaton FA1 = builder.buildSimpleAutomaton(node1);
 		Finite_Automaton FA2 = builder.buildSimpleAutomaton(node2);

@@ -16,8 +16,8 @@ import regex_to_fa.Regex_to_FA;
 import toolbox.FA_Dimension;
 import toolbox.Finite_Automaton;
 import toolbox.Tree_Node;
-import toolbox.Tree_Node.LeafNode;
-import toolbox.Tree_Node.StarNode;
+import toolbox.Tree_Node.Leaf_Node;
+import toolbox.Tree_Node.Star_Node;
 import view.FA_Drawer;
 
 public class Regex_Converter_Panel extends JPanel {
@@ -339,7 +339,7 @@ public class Regex_Converter_Panel extends JPanel {
 	}
 
 	public void convertToFa(Tree_Node node) {
-		if (node instanceof LeafNode) {
+		if (node instanceof Leaf_Node) {
 			this.left = null;
 			this.right = null;
 			this.fa = converter.generateFA(node).copy();
@@ -349,7 +349,7 @@ public class Regex_Converter_Panel extends JPanel {
 			this.left = converter.generateFA(left).copy();
 			leftAdded = false;
 
-			if (node instanceof StarNode) {
+			if (node instanceof Star_Node) {
 				this.right = null;
 
 			} else {
@@ -363,19 +363,19 @@ public class Regex_Converter_Panel extends JPanel {
 	}
 
 	public Tree_Node parent(Tree_Node node) {
-		if (node instanceof LeafNode) {
+		if (node instanceof Leaf_Node) {
 			return node;
 
 		} else {
 			Tree_Node leaf = getLeftmostLeaf(node);
 			Tree_Node currentParent = leaf.getParent();
 
-			if (currentParent instanceof StarNode) {
+			if (currentParent instanceof Star_Node) {
 				return currentParent;
 
 			} else {
 				Tree_Node right = currentParent.getRightChild();
-				if (right instanceof LeafNode) {
+				if (right instanceof Leaf_Node) {
 					return currentParent;
 
 				} else {
@@ -386,7 +386,7 @@ public class Regex_Converter_Panel extends JPanel {
 	}
 
 	public Tree_Node getLeftmostLeaf(Tree_Node node) {
-		if (node instanceof LeafNode) {
+		if (node instanceof Leaf_Node) {
 			return node;
 		}
 		return getLeftmostLeaf(node.getLeftChild());

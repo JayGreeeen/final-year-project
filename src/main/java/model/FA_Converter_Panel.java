@@ -2,6 +2,7 @@ package model;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,6 +206,8 @@ public class FA_Converter_Panel extends JPanel {
 			centrey += 100;
 
 			if (fa.getFinalStates().size() > 1) {
+				// if there is more than one final state, create a new final
+				// state
 				fa = converter.createNewFinalState(fa);
 
 			} else {
@@ -213,8 +216,6 @@ public class FA_Converter_Panel extends JPanel {
 				if (!states.isEmpty()) {
 					State state = states.get(0);
 					remover.removeConnectionsTo(state, fa);
-
-					checkFinished();
 				} else {
 					State initial = fa.getInitialState();
 
@@ -245,9 +246,10 @@ public class FA_Converter_Panel extends JPanel {
 			State initialState = fa.getInitialState();
 			State finalState = fa.getFinalStates().get(0);
 
-			ArrayList<String> initialTransitions = initialState.getTransitionsTo(finalState);
+			ArrayList<String> initialToFinalTransitions = initialState.getTransitionsTo(finalState);
+			ArrayList<String> initialToInitialTransitions = initialState.getTransitionsTo(initialState);
 
-			if (initialTransitions.size() == 0) {
+			if (initialToFinalTransitions.size() == 0) {
 				// there are no transitions
 				lblRegex.setText("\\ FA accepts no words");
 				btnNext.setEnabled(false);
@@ -260,13 +262,15 @@ public class FA_Converter_Panel extends JPanel {
 
 				ArrayList<String> finalTransitions = finalState.getTransitionsTo(initialState);
 
-				if (initialTransitions.size() == 1 && finalTransitions.size() == 0) {
+				if (initialToInitialTransitions.size() == 0 && initialToFinalTransitions.size() == 1
+						&& finalTransitions.size() == 0) {
 
 					// there is a single transition left
 					String regex = initialState.getTransitionsTo(finalState).get(0);
 					lblRegex.setText(regex);
 					lblDone.setText("Done");
 					btnNext.setEnabled(false);
+
 					addedToMap = true;
 
 					int width = lblRegex.getText().length();
@@ -290,10 +294,12 @@ public class FA_Converter_Panel extends JPanel {
 		State initialState = fa.getInitialState();
 		State finalState = fa.getFinalStates().get(0);
 
+
 		ArrayList<String> transitions = initialState.getTransitionsTo(finalState);
 		if (transitions.size() == 0) {
 			// there are no transitions
 			lblRegex.setText("\\ FA accepts no words");
+//			lblRegex.siz
 			btnNext.setEnabled(false);
 			lblDone.setText("Done");
 		} else {
@@ -423,6 +429,7 @@ public class FA_Converter_Panel extends JPanel {
 	 */
 	public void setRegexLabel(JLabel label) {
 		this.lblRegex = label;
+		label.setFont(new Font("Verdana", Font.PLAIN, 15));
 	}
 
 	/**

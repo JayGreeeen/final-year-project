@@ -9,14 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import model.Regex_Converter_Panel;
 import toolbox.Finite_Automaton;
 import toolbox.Tree_Node;
-import toolbox.Tree_Node.ConcatNode;
-import toolbox.Tree_Node.LeafNode;
-import toolbox.Tree_Node.StarNode;
-import toolbox.Tree_Node.UnionNode;
+import toolbox.Tree_Node.Concat_Node;
+import toolbox.Tree_Node.Leaf_Node;
+import toolbox.Tree_Node.Star_Node;
+import toolbox.Tree_Node.Union_Node;
 
 /**
  * Performs the conversion from a regular expression to a finite automaton
- * @author jay
+ * @author Jaydene Green-Stevens
  *
  */
 public class Regex_to_FA {
@@ -24,10 +24,8 @@ public class Regex_to_FA {
 	private Map<Integer, Integer> bracketMap = new HashMap<Integer, Integer>();
 	private char[] chars;
 	
-//	private Regex_Converter_Panel converter;
 	
 	public Regex_to_FA(Regex_Converter_Panel converter){
-//		this.converter = converter;
 	}
 	
 	public Tree_Node convertToTree(String regex){
@@ -44,8 +42,8 @@ public class Regex_to_FA {
 		// take in the root of the tree and generate the FA
 		Automaton_Builder builder = new Automaton_Builder();
 
-		if (node instanceof LeafNode) {
-			return builder.buildSimpleAutomaton((LeafNode) node);
+		if (node instanceof Leaf_Node) {
+			return builder.buildSimpleAutomaton((Leaf_Node) node);
 			
 		} else {
 			// not a leaf node
@@ -53,7 +51,7 @@ public class Regex_to_FA {
 			if (node.getLeftChild() != null) {
 				Finite_Automaton leftFA = generateFA(node.getLeftChild());
 
-				if (node instanceof StarNode) {
+				if (node instanceof Star_Node) {
 					
 					Finite_Automaton fa = builder.addStarOperator(leftFA);
 					return fa;
@@ -63,12 +61,12 @@ public class Regex_to_FA {
 					if (node.getRightChild() != null) {
 						Finite_Automaton rightFA = generateFA(node.getRightChild());
 
-						if (node instanceof UnionNode) {
+						if (node instanceof Union_Node) {
 							// use rule 3 to connect child NFAs
 							Finite_Automaton fa = builder.combineWithUnion(leftFA, rightFA);
 							return fa;
 							
-						} else if (node instanceof ConcatNode) {
+						} else if (node instanceof Concat_Node) {
 							// use rule 4 to connect child NFAs
 							Finite_Automaton fa = builder.combineWithConcat(leftFA, rightFA);
 							return fa;

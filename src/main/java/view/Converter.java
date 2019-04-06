@@ -693,7 +693,7 @@ public class Converter {
 						faDiagramFAPanel.convert(faToConvert);
 
 					} else {
-						String message = "Please choose a final state. To select multiple hold the 'command' key";
+						String message = "Please choose a final state. To select multiple hold the 'command' key.";
 						throwError(message);
 					}
 				} else {
@@ -701,7 +701,7 @@ public class Converter {
 					throwError(message);
 				}
 			} else {
-				String message = "The Input alphabet cannot be empty. Plesse enter some ";
+				String message = "The Input alphabet cannot be empty.";
 				throwError(message);
 			}
 		}
