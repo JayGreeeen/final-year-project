@@ -22,16 +22,14 @@ import toolbox.State;
 import view.FA_Drawer;
 
 /**
- * The panel which handles the display of the FA on the FAToRegex page
+ * The panel which handles the display of the FA on the FA to regex page. Takes in
+ * FA and draws the stages of conversion into a regex
  * 
  * @author Jaydene Green-Stevens
  *
  */
 public class FA_Converter_Panel extends JPanel {
 
-	// takes in FA
-	// converts into regex
-	// draws the stages of conversion
 	private Finite_Automaton fa = null;
 	private Finite_Automaton initialFA = null;
 
@@ -294,12 +292,11 @@ public class FA_Converter_Panel extends JPanel {
 		State initialState = fa.getInitialState();
 		State finalState = fa.getFinalStates().get(0);
 
-
 		ArrayList<String> transitions = initialState.getTransitionsTo(finalState);
 		if (transitions.size() == 0) {
 			// there are no transitions
 			lblRegex.setText("\\ FA accepts no words");
-//			lblRegex.siz
+			// lblRegex.siz
 			btnNext.setEnabled(false);
 			lblDone.setText("Done");
 		} else {

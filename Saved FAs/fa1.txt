@@ -1,5 +1,0 @@
-Input Alphabet:[a]
-States:[1]
-Transitions:[1:a>1]
-Initial State:1
-Final State(s):[1]

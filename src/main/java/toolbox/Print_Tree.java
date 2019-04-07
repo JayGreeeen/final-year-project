@@ -1,5 +1,10 @@
 package toolbox;
 
+/**
+ * Prints a formatted, human readable version of a binary tree
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class Print_Tree {
 
 	public static void printSideways(Tree_Node node) {

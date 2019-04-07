@@ -20,6 +20,13 @@ import toolbox.Tree_Node.Leaf_Node;
 import toolbox.Tree_Node.Star_Node;
 import view.FA_Drawer;
 
+/**
+ * The panel which handles the display of the FA on the Regex to FA page. Takes
+ * in regex and draws the stages of conversion into an FA
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class Regex_Converter_Panel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -62,6 +69,11 @@ public class Regex_Converter_Panel extends JPanel {
 
 	}
 
+	/**
+	 * Paint method - draws the automata to the screen. This is called
+	 * recursively, so has checks to keep the number of calls to a minimum
+	 */
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -84,39 +96,38 @@ public class Regex_Converter_Panel extends JPanel {
 		}
 	}
 
+	/**
+	 * Takes the automaton of the left and right child nodes and the automaton
+	 * for how they are combined using the parent operator, and draws them to
+	 * the screen. Checks ensure that the automata do not overlap on the screen.
+	 * If they do, they are repositioned and redrawn.
+	 */
 	private void paintFA() {
 		if (left != null) {
 
 			if (currentLowestPoint > 0) {
-				// System.out.println("current lowest pos: " +
-				// currentLowestPoint);
 				leftCentrey = currentLowestPoint;
 			}
 
+			// set the centre position of where to start drawing the automaton
 			drawer.setCentre(centrex, leftCentrey);
 			drawer.drawFA(left);
-			// System.out.println("Drawing left at position: " + centrex + ", "
-			// + leftCentrey);
 
+			// used to check if there is any overlap with another automaton
 			FA_Dimension leftDimension = drawer.getDimension();
 			int leftForwardArrowPos = leftDimension.getTransitionHeight();
 			int leftBackArrowPos = leftDimension.getBackTransitionHeight();
 
-			// System.out.println("\tInitial left: forward arrow pos: " +
-			// leftDimension.getTransitionHeight() + " , back arrow pos: " +
-			// leftBackArrowPos);
-
+			// checks that the highest forward arrow does not go off the screen.
+			// Otherwise it is repositioned.
 			if (leftForwardArrowPos < 0) {
 				int difference = 0 - leftForwardArrowPos;
 				leftCentrey += difference + 50;
 				leftForwardArrowPos += difference + 50;
-				// System.out.println("left goes off the page. leftcentrey: " +
-				// leftCentrey);
 			}
 
-			// System.out.println("\tCurrent lowest point: " +
-			// currentLowestPoint);
-
+			// checks to see if it overlaps with anything previously drawn on
+			// the screen.
 			if (currentLowestPoint != 0 && leftForwardArrowPos < currentLowestPoint) {
 				// left overlaps previous
 
@@ -125,25 +136,25 @@ public class Regex_Converter_Panel extends JPanel {
 
 				leftCentrey = currentLowestPoint + forwardHeight + 50;
 				leftBackArrowPos = leftCentrey + backHeight;
-				// System.out.println("moving down. leftCentrey: " +
-				// leftCentrey);
 			}
 
+			// lowest drawn point on the screen - nothing should overlap this
 			currentLowestPoint = leftBackArrowPos;
 
+			// if the current parent is a star node there will be no right child
 			if (right != null) {
 				rightCentrey = leftCentrey + 150;
 				drawer.setCentre(centrex, rightCentrey);
 				drawer.drawFA(right);
-				// System.out.println("Drawing right at position: " + centrex +
-				// ", " + rightCentrey);
 
+				// used to check for overlap
 				FA_Dimension rightDimension = drawer.getDimension();
 				int rightForwardArrowPos = rightDimension.getTransitionHeight();
 				int rightBackArrowPos = rightDimension.getBackTransitionHeight();
 
+				// checks to see if the right child automaton overlaps the left
+				// child
 				if (leftBackArrowPos >= rightForwardArrowPos) {
-					// System.out.println("Right overlaps left ");
 					int forwardHeight = rightCentrey - rightForwardArrowPos;
 					int backHeight = rightBackArrowPos - rightCentrey;
 
@@ -154,17 +165,15 @@ public class Regex_Converter_Panel extends JPanel {
 				faCentrey = rightCentrey + 150;
 				drawer.setCentre(centrex, faCentrey);
 				drawer.drawFA(fa);
-				// System.out.println("Drawing fa at position: " + centrex + ",
-				// " + faCentrey);
 
+				// used to check for overlap
 				FA_Dimension faDimension = drawer.getDimension();
 				int faForwardArrowPos = faDimension.getTransitionHeight();
 				int faBackArrowPos = faDimension.getBackTransitionHeight();
 				int faLength = faDimension.getLength();
 
+				// checks to see if this overlaps the previously drawn automaton
 				if (rightBackArrowPos >= faForwardArrowPos) {
-					// System.out.println("fa overlaps right ");
-
 					int forwardHeight = faCentrey - faForwardArrowPos;
 					int backHeight = faBackArrowPos - faCentrey;
 
@@ -172,12 +181,14 @@ public class Regex_Converter_Panel extends JPanel {
 					faBackArrowPos = faCentrey + backHeight;
 				}
 
-				// System.out.println("frame height: " + frameHeight + ". Fa
-				// back arrow pos: " + faBackArrowPos);
+				// checks to see if the automaton goes off the bottom of the
+				// panel - resizes if necessary
 				if (faBackArrowPos >= frameHeight - 100) {
 					setFrameSize(frameWidth, faBackArrowPos + 200);
 				}
 
+				// checks to see if the automaton goes off the edge of the panel
+				// - resizes if necessary
 				if (faLength >= frameWidth - 100) {
 					setFrameSize(faLength + 200, frameHeight);
 				}
@@ -188,16 +199,14 @@ public class Regex_Converter_Panel extends JPanel {
 				faCentrey = leftCentrey + 150;
 				drawer.setCentre(centrex, faCentrey);
 				drawer.drawFA(fa);
-				// System.out.println("Drawing fa at position: " + centrex + ","
-				// + faCentrey);
 
 				FA_Dimension faDimension = drawer.getDimension();
 				int faForwardArrowPos = faDimension.getTransitionHeight();
 				int faBackArrowPos = faDimension.getBackTransitionHeight();
 				int faLength = faDimension.getLength();
 
+				// check for overlap
 				if (leftBackArrowPos >= faForwardArrowPos) {
-					// System.out.println("fa overlaps left");
 					int forwardHeight = faCentrey - faForwardArrowPos;
 					int backHeight = faBackArrowPos - faCentrey;
 
@@ -205,13 +214,13 @@ public class Regex_Converter_Panel extends JPanel {
 					faBackArrowPos = faCentrey + backHeight;
 				}
 
-				// System.out.println("frame height: " + frameHeight + ". Fa
-				// back arrow pos: " + faBackArrowPos);
-
+				// checks to see if the automaton goes off the bottom of the
+				// panel
 				if (faBackArrowPos >= frameHeight - 100) {
 					setFrameSize(frameWidth, faBackArrowPos + 200);
 				}
 
+				// checks to see if the automaton goes off the edge of the panel
 				if (faLength + 100 >= frameWidth) {
 					setFrameSize(faLength + 200, frameHeight);
 				}
@@ -232,9 +241,6 @@ public class Regex_Converter_Panel extends JPanel {
 					leftCentrey += difference + 20;
 				}
 
-				// System.out.println("frame height: " + frameHeight + ". Fa
-				// back arrow pos: " + faBackArrowPos);
-
 				if (faBackArrowPos >= frameHeight - 100) {
 					setFrameSize(frameWidth, faBackArrowPos + 100);
 				}
@@ -244,7 +250,6 @@ public class Regex_Converter_Panel extends JPanel {
 				}
 
 				if (currentLowestPoint != 0 && faForwardArrowPos < currentLowestPoint) {
-					// System.out.println("moving down");
 					int difference;
 					if (faForwardArrowPos < 0) {
 						difference = currentLowestPoint - (0 - faForwardArrowPos);
@@ -259,25 +264,22 @@ public class Regex_Converter_Panel extends JPanel {
 			}
 		}
 
+		// the map keeps track of the positions of all drawn automata, allowing
+		// them to all be redrawn and remain on the screen each time the frame
+		// is repainted
 		if (leftAdded == false) {
-			// System.out.println("adding left to map. position: " + centrex +
-			// ", " + leftCentrey);
 			Integer[] posValues = { centrex, leftCentrey };
 			faMap.put(left.copy(), posValues);
 			leftAdded = true;
 		}
 
 		if (rightAdded == false) {
-			// System.out.println("adding right to map. position: " + centrex +
-			// ", " + rightCentrey);
 			Integer[] posValues = { centrex, rightCentrey };
 			faMap.put(right.copy(), posValues);
 			rightAdded = true;
 		}
 
 		if (faAdded == false) {
-			// System.out.println("adding fa to map. position: " + centrex + ",
-			// " + faCentrey);
 			Integer[] posValues = { centrex, faCentrey };
 			faMap.put(fa.copy(), posValues);
 			faAdded = true;
@@ -286,8 +288,11 @@ public class Regex_Converter_Panel extends JPanel {
 		repaint();
 	}
 
+	/**
+	 * Redraws all automata to the screen at their set positions
+	 */
+
 	private void redraw() {
-//		System.out.println("redrawing. map size: " + faMap.size());
 		Finite_Automaton fa;
 		Integer[] values;
 
@@ -301,11 +306,26 @@ public class Regex_Converter_Panel extends JPanel {
 
 	}
 
+	/**
+	 * Resizes the frame
+	 * 
+	 * @param width
+	 *            of the frame
+	 * @param height
+	 *            of the frame
+	 */
+
 	private void setFrameSize(int width, int height) {
 		this.setPreferredSize(new Dimension(width, height));
 		frameWidth = width;
 		frameHeight = height;
 	}
+
+	/**
+	 * Takes in the initial regex input, validates it and builds the binary tree
+	 * 
+	 * @param regex
+	 */
 
 	public void convert(String regex) {
 		leftCentrey = 150;
@@ -321,7 +341,7 @@ public class Regex_Converter_Panel extends JPanel {
 			// Print_Tree.printSideways(root);
 			// Print_Tree.print(root);
 
-			currentParent = parent(root);
+			currentParent = getLeftmostParent(root);
 
 			if (currentParent.getParent() == null) {
 				btnNext.setEnabled(false);
@@ -338,7 +358,12 @@ public class Regex_Converter_Panel extends JPanel {
 		}
 	}
 
-	public void convertToFa(Tree_Node node) {
+	/**
+	 * Creates the automaton for a node in the tree
+	 * 
+	 * @param node
+	 */
+	private void convertToFa(Tree_Node node) {
 		if (node instanceof Leaf_Node) {
 			this.left = null;
 			this.right = null;
@@ -362,7 +387,16 @@ public class Regex_Converter_Panel extends JPanel {
 		}
 	}
 
-	public Tree_Node parent(Tree_Node node) {
+	/**
+	 * Gets the leftmost parent node in the tree to convert. This is a node
+	 * containing an operator, •, *, or |
+	 * 
+	 * @param node
+	 *            in tree to recursively search
+	 * @return the leftmost parent node
+	 */
+
+	private Tree_Node getLeftmostParent(Tree_Node node) {
 		if (node instanceof Leaf_Node) {
 			return node;
 
@@ -379,19 +413,31 @@ public class Regex_Converter_Panel extends JPanel {
 					return currentParent;
 
 				} else {
-					return parent(right);
+					return getLeftmostParent(right);
 				}
 			}
 		}
 	}
 
-	public Tree_Node getLeftmostLeaf(Tree_Node node) {
+	/**
+	 * Returns the leftmost leaf in the tree. This is a node containing a symbol
+	 * of the input alphabet
+	 * 
+	 * @param node
+	 *            in tree to recursively search
+	 * @return the leftmost leaf node
+	 */
+	private Tree_Node getLeftmostLeaf(Tree_Node node) {
 		if (node instanceof Leaf_Node) {
 			return node;
 		}
 		return getLeftmostLeaf(node.getLeftChild());
 	}
 
+	/**
+	 * Carries out the next conversion step. Activated by pushing the 'next'
+	 * button on the interface.
+	 */
 	public void drawNext() {
 		if (currentParent.getParent() != null) {
 			Tree_Node parent = currentParent.getParent();
@@ -406,18 +452,26 @@ public class Regex_Converter_Panel extends JPanel {
 			repaint();
 		} else {
 			btnNext.setEnabled(false);
-			System.out.println("currrent parent is null");
 		}
 	}
 
+	/**
+	 * Sets the 'next' button object, links it to the converter class
+	 * 
+	 * @param next
+	 *            button
+	 */
 	public void setNextButton(JButton next) {
 		this.btnNext = next;
 	}
-	
-	public void resetPage(){
+
+	/**
+	 * Removes all user input and drawings from the page
+	 */
+	public void resetPage() {
 		left = null;
 		fa = null;
-		
+
 		setFrameSize(2000, 500);
 	}
 

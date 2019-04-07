@@ -1,5 +1,11 @@
 package toolbox;
 
+/**
+ * Interface for a node within a binary tree
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public interface Tree_Node {
 
 	public Tree_Node getParent();
@@ -9,7 +15,7 @@ public interface Tree_Node {
 	public void addChild(Tree_Node node);
 
 	public void setLeftChild(Tree_Node node);
-	
+
 	public void replaceChild(Tree_Node oldNode, Tree_Node newNode);
 
 	public Tree_Node getLeftChild();
@@ -24,6 +30,13 @@ public interface Tree_Node {
 
 	public String toString();
 
+	/**
+	 * Implementation of a Tree_Node. Represents the concatenation operator with
+	 * the symbol •
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
 	public class Concat_Node implements Tree_Node {
 		private Tree_Node parent;
 		private String text;
@@ -36,51 +49,79 @@ public interface Tree_Node {
 			this.parent = parent;
 		}
 
+		/**
+		 * Adds a child node to the concat node
+		 */
 		public void addChild(Tree_Node node) {
 			if (leftChild == null) {
 				leftChild = node;
 			} else {
 				rightChild = node;
 			}
-			// System.out.println("Added child to concat node: " +
-			// node.getText());
 			childCount++;
 		}
 
+		/**
+		 * Returns the left child node
+		 */
 		public Tree_Node getLeftChild() {
 			return leftChild;
 		}
 
+		/**
+		 * Returns the right child node
+		 */
 		public Tree_Node getRightChild() {
 			return rightChild;
 		}
 
+		/**
+		 * Returns the parent node. Could be null if the node is the root of the
+		 * tree.
+		 */
 		public Tree_Node getParent() {
 			return parent;
 		}
 
+		/**
+		 * Returns the text inside the concat node - •
+		 */
 		public String getText() {
 			return text;
 		}
 
+		/**
+		 * Sets the parent node
+		 */
 		public void setParent(Tree_Node node) {
 			this.parent = node;
 		}
 
+		/**
+		 * Returns the number of child nodes the node has
+		 */
 		public int getChildCount() {
 			return childCount;
 		}
 
-		public void setLeftChild(Tree_Node node) {}
+		public void setLeftChild(Tree_Node node) {
+		}
 
-		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){
-			if (oldNode == leftChild){
+		/**
+		 * Replaces an existing child of the node with a new one
+		 */
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode) {
+			if (oldNode == leftChild) {
 				leftChild = newNode;
-			} else if (oldNode == rightChild){
+			} else if (oldNode == rightChild) {
 				rightChild = newNode;
 			}
 		}
-		
+
+		/**
+		 * Checks to see if the node has a parent node, i.e. is it the root of
+		 * the tree
+		 */
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;
@@ -94,6 +135,13 @@ public interface Tree_Node {
 
 	}
 
+	/**
+	 * Implementation of the Tree_Node. Represents star node with symbol *. Can
+	 * only have a single child node.
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
 	public class Star_Node implements Tree_Node {
 
 		private Tree_Node parent;
@@ -106,50 +154,81 @@ public interface Tree_Node {
 			this.parent = parent;
 		}
 
+		// Adds a child node to the tree
 		public void addChild(Tree_Node node) {
 			child = node;
 			childCount++;
 		}
 
+		/**
+		 * Sets the parent node
+		 */
 		public void setParent(Tree_Node node) {
 			this.parent = node;
 		}
 
+		/**
+		 * @return the child node
+		 */
 		public Tree_Node getChild() {
 			return child;
 		}
 
+		/**
+		 * Returns the parent node
+		 */
 		public Tree_Node getParent() {
 			return parent;
 		}
 
+		/**
+		 * Returns the text inside the node; *
+		 */
 		public String getText() {
 			return text;
 		}
 
+		/**
+		 * Returns the left child of the node
+		 */
 		public Tree_Node getLeftChild() {
 			return child;
 		}
 
+		/**
+		 * Star nodes cannot have a right child, so will return null
+		 */
 		public Tree_Node getRightChild() {
-			// * node has no right child
 			return null;
 		}
 
+		/**
+		 * Returns the number of child nodes the node has. Maximum should be 1
+		 */
 		public int getChildCount() {
 			return childCount;
 		}
 
+		/**
+		 * Sets the left child of the node
+		 */
 		public void setLeftChild(Tree_Node node) {
 			child = node;
 		}
-		
-		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){
-			if (oldNode == child){
+
+		/**
+		 * Replaces an existing child with a new one
+		 */
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode) {
+			if (oldNode == child) {
 				child = newNode;
 			}
 		}
-		
+
+		/**
+		 * Checks to see whether the node has a parent node, i.e. whether or not
+		 * it is the root of the tree
+		 */
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;
@@ -163,6 +242,13 @@ public interface Tree_Node {
 
 	}
 
+	/**
+	 * Implementation of the Tree_Node. Represents leaf node which is a
+	 * childless node, containing a symbol of the input alphabet.
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
 	public class Leaf_Node implements Tree_Node {
 
 		private Tree_Node parent;
@@ -170,45 +256,72 @@ public interface Tree_Node {
 
 		public Leaf_Node(String text) {
 			this.text = text;
-			// this.parent = parent;
 		}
 
+		/**
+		 * Returns the parent of the node
+		 */
 		public Tree_Node getParent() {
 			return parent;
 		}
 
+		/**
+		 * Returns the text inside the node - symbol of the input alphabet
+		 */
 		public String getText() {
 			return text;
 		}
 
+		/**
+		 * Leaf nodes cannot have children. This method has no functionality
+		 */
 		public void addChild(Tree_Node node) {
 		}
 
+		/**
+		 * Sets the parent of the leaf node
+		 */
 		public void setParent(Tree_Node node) {
 			this.parent = node;
 		}
 
+		/**
+		 * Leaf node has no left child, returns null for this method
+		 */
 		public Tree_Node getLeftChild() {
 			return null;
 		}
 
+		/**
+		 * Leaf node has no right child, returns null for this method
+		 */
 		public Tree_Node getRightChild() {
 			return null;
 		}
 
+		/**
+		 * Leaf node has no children, returns 0 for this method
+		 */
 		public int getChildCount() {
-			// leaf nodes do not have children
 			return 0;
 		}
 
+		/**
+		 * Leaf nodes cannot have children. This method has no functionality
+		 */
 		public void setLeftChild(Tree_Node node) {
 		}
 
-		
-		
-		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){}
-		
-		
+		/**
+		 * Leaf nodes cannot have children. This method has no functionality
+		 */
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode) {
+		}
+
+		/**
+		 * Checks to see if the leaf node has a parent node, i.e. is it the root
+		 * of the tree
+		 */
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;
@@ -222,6 +335,13 @@ public interface Tree_Node {
 
 	}
 
+	/**
+	 * Implementation of the Tree_Node. Represents union node which contains the
+	 * symbol |.
+	 * 
+	 * @author Jaydene Green-Stevens
+	 *
+	 */
 	public class Union_Node implements Tree_Node {
 
 		private Tree_Node parent;
@@ -234,14 +354,23 @@ public interface Tree_Node {
 			text = "|";
 		}
 
+		/**
+		 * Returns the parent node of the union node
+		 */
 		public Tree_Node getParent() {
 			return parent;
 		}
 
+		/**
+		 * Returns the text of the union node - |
+		 */
 		public String getText() {
 			return text;
 		}
 
+		/**
+		 * Adds a child to the node
+		 */
 		public void addChild(Tree_Node node) {
 			if (leftChild == null) {
 				leftChild = node;
@@ -251,35 +380,56 @@ public interface Tree_Node {
 			childCount++;
 		}
 
+		/**
+		 * Returns the left child of the node
+		 */
 		public Tree_Node getLeftChild() {
 			return leftChild;
 		}
 
+		/**
+		 * Returns the right child of the node
+		 */
 		public Tree_Node getRightChild() {
 			return rightChild;
 		}
 
+		/**
+		 * Sets the nodes parent
+		 */
 		public void setParent(Tree_Node node) {
-			// System.out.println("Setting left child of | to " + node);
 			parent = node;
 		}
 
+		/**
+		 * Returns the number of child nodes the node has
+		 */
 		public int getChildCount() {
 			return childCount;
 		}
 
+		/**
+		 * Sets the value of the left child node
+		 */
 		public void setLeftChild(Tree_Node node) {
 			leftChild = node;
 		}
-		
-		public void replaceChild(Tree_Node oldNode, Tree_Node newNode){
-			if (oldNode == leftChild){
+
+		/**
+		 * Replaces an existing child node with a new node
+		 */
+		public void replaceChild(Tree_Node oldNode, Tree_Node newNode) {
+			if (oldNode == leftChild) {
 				leftChild = newNode;
-			} else if (oldNode == rightChild){
+			} else if (oldNode == rightChild) {
 				rightChild = newNode;
 			}
 		}
 
+		/**
+		 * Checks the see if the node has a parent, i.e. whether or not it is
+		 * the root node
+		 */
 		public boolean parentSet() {
 			if (parent == null) {
 				return false;

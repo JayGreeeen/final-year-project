@@ -176,6 +176,9 @@ public class Regex_to_FA {
 		if (!regex.contains("*")) {
 			return true;
 		}
+		
+		boolean valid = false;
+		
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 
@@ -184,16 +187,17 @@ public class Regex_to_FA {
 					char prevChar = chars[i - 1];
 
 					if (Character.isLetterOrDigit(prevChar)) {
-						return true;
-					}
-					if (prevChar == ')' && chars[i - 2] != '(') {
+						valid = true;
+					} else if (prevChar == ')' && chars[i - 2] != '(') {
 						// cant have the case ()*
-						return true;
+						valid = true;
+					} else {
+						return false;
 					}
 				}
 			}
 		}
-		return false;
+		return valid;
 	}
 
 	/**
@@ -205,6 +209,9 @@ public class Regex_to_FA {
 		if (!regex.contains("|")) {
 			return true;
 		}
+		
+		boolean valid = false;
+		
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 			if (c == '|') {
@@ -214,13 +221,19 @@ public class Regex_to_FA {
 
 					if (charBefore == '*' || charBefore == ')' || Character.isLetterOrDigit(charBefore)) {
 						if (charAfter == '(' || Character.isLetterOrDigit(charAfter)) {
-							return true;
+							valid = true;
+						} else {
+							return false;
 						}
+					} else {
+						return false;
 					}
+				} else {
+					return false;
 				}
 			}
 		}
-		return false;
+		return valid;
 	}
 
 }

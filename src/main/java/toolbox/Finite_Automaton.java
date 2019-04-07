@@ -4,13 +4,19 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * Object representing a finite automaton, containing states, transitions, and
+ * an alphabet of symbols.
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class Finite_Automaton {
 
 	private State initialState;
 	private ArrayList<State> finalStates;
 	private ArrayList<String> inputAlphabet;
 	private ArrayList<State> states;
-	// private TransitionTable transitions;
 
 	public Finite_Automaton(State initialState, ArrayList<State> finalStates, ArrayList<State> states,
 			ArrayList<String> inputAlphabet) {
@@ -18,33 +24,56 @@ public class Finite_Automaton {
 		this.finalStates = finalStates;
 		this.states = states;
 		this.inputAlphabet = inputAlphabet;
-		// this.transitions = transitions;
 	}
 
+	/**
+	 * Removes the specified state from the automaton
+	 * 
+	 * @param state
+	 *            to remove
+	 */
 	public void removeState(State state) {
 		states.remove(state);
 	}
 
+	/**
+	 * @return the input alphabet for the automaton
+	 */
 	public ArrayList<String> getInputAlphabet() {
 		return inputAlphabet;
 	}
 
+	/**
+	 * @return the number of sttaes in the automaton
+	 */
 	public int getStateCount() {
 		return states.size();
 	}
 
+	/**
+	 * @return the initial state of the automaton
+	 */
 	public State getInitialState() {
 		return initialState;
 	}
 
+	/**
+	 * @return the list of final states - there may be mroe than one
+	 */
 	public ArrayList<State> getFinalStates() {
 		return finalStates;
 	}
 
+	/**
+	 * @return the list of states in the automaton
+	 */
 	public ArrayList<State> getStates() {
 		return states;
 	}
 
+	/**
+	 * Provides a clean output for the automaton
+	 */
 	public String toString() {
 
 		String transitionOutput = "";
@@ -66,58 +95,65 @@ public class Finite_Automaton {
 				+ "\nInput alphabet: " + inputAlphabet + "\nTransitions: " + transitionOutput;
 	}
 
+	/**
+	 * @return a new automaton object with all the same information as the
+	 *         current automaton
+	 */
 	public Finite_Automaton copy() {
 		ArrayList<State> finalStatesList = new ArrayList<>();
-//		finalStatesList.addAll(finalStates);
-		
+
 		State initial = initialState;
 
 		ArrayList<State> stateList = new ArrayList<>();
-		for (State s : states){
+		for (State s : states) {
 			State newState = new State(s.getLabel());
-			
-			if (s.isFinalState()){
+
+			if (s.isFinalState()) {
 				newState.setFinal(true);
 				finalStatesList.add(newState);
 			}
-			if (s.isInitialState()){
+			if (s.isInitialState()) {
 				newState.setInitial(true);
 				initial = newState;
 			}
-			
+
 			stateList.add(newState);
 		}
-		
-		for (State s : states){
-			
-			// need to first make the list, and then go through and add all the transitions to it
-			// pretty sure have done this once in the class that builds the FA from the front end
-			// so check that
-			
+
+		for (State s : states) {
+
 			State newState = getState(s.getLabel(), stateList);
-			
+
 			Map<State, ArrayList<String>> map = s.getTransitions();
-			
-			for (Entry<State, ArrayList<String>> e : map.entrySet()){
-				
-//				State old = (State) e.getKey();
+
+			for (Entry<State, ArrayList<String>> e : map.entrySet()) {
+
+				// State old = (State) e.getKey();
 				State to = getState(((State) e.getKey()).getLabel(), stateList);
-				
+
 				ArrayList<String> transitions = (ArrayList<String>) e.getValue();
-				
-				for (String label : transitions){
+
+				for (String label : transitions) {
 					newState.addTransition(to, label);
 				}
 			}
 		}
-		
+
 		ArrayList<String> inputList = new ArrayList<>();
 		inputList.addAll(inputAlphabet);
 
-		
 		return new Finite_Automaton(initial, finalStatesList, stateList, inputList);
 	}
-	
+
+	/**
+	 * Finds a state object in the list of states based on its label
+	 * 
+	 * @param label
+	 *            of the state
+	 * @param states
+	 *            list of states
+	 * @return the state object
+	 */
 	private State getState(String label, ArrayList<State> states) {
 		for (State state : states) {
 			if (state.getLabel().equals(label)) {
