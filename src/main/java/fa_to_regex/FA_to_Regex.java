@@ -2,55 +2,31 @@ package fa_to_regex;
 
 import java.util.ArrayList;
 
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
 
+/**
+ * Aids in conversion from FA to Regex
+ * 
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class FA_to_Regex {
-	private State_Remover remover = new State_Remover();
 
 	public FA_to_Regex() {
 
 	}
 
-	public String convert(Finite_Automata fa) {
-		ArrayList<State> finalStates = fa.getFinalStates();
-		ArrayList<State> states = new ArrayList<State>();
-		states.addAll(fa.getStates());
-
-		State initial = fa.getInitialState();
-		State finalState;
-		
-		states.remove(initial);
-
-		if (finalStates.size() > 1) { // more than one final state
-			finalState = new State(Integer.toString(fa.getStateCount() + 1));
-			newFinalState(finalStates, finalState);
-
-			finalStates.clear();
-			finalStates.add(finalState);
-			fa = new Finite_Automata(initial, finalStates, states, fa.getInputAlphabet());
-			// adds the new final state to the automaton
-
-		} else { // there is only one final state
-			finalState = finalStates.get(0);
-			states.remove(finalState);
-		}
-		
-		
-		if (!states.isEmpty()) {
-			removeStates(states, fa);
-		}
-
-		String regex = remover.cleanUpInitialAndFinalStates(fa);
-
-//		if (regex.startsWith("(") && regex.endsWith(")")){
-//			regex = regex.substring(1, regex.length() - 1);
-//		}
-		
-		return regex;
-	}
-
-	private void newFinalState(ArrayList<State> finalStates, State finalState) {
+	/**
+	 * Adds a new final state by adding empty transition jumps from all the
+	 * existing final states to the new final states
+	 * 
+	 * @param finalStates
+	 *            the list of existing final states
+	 * @param finalState
+	 *            the new final state
+	 */
+	private void createNewFinalState(ArrayList<State> finalStates, State finalState) {
 		for (State state : finalStates) {
 			state.setFinal(false);
 			state.addEmptyTransition(finalState);
@@ -58,10 +34,54 @@ public class FA_to_Regex {
 
 	}
 
-	private void removeStates(ArrayList<State> states, Finite_Automata fa) {
-		for (State state : states) {
-			remover.removeConnectionsTo(state, fa);
-		}
+	/**
+	 * Returns the list of states which can be removed. Does not include the
+	 * initial or final state
+	 * 
+	 * @param fa
+	 *            the automaton to get the list of states for
+	 * @return the states to be removed from the automaton
+	 */
+	public ArrayList<State> getStatesToRemove(Finite_Automaton fa) {
+		ArrayList<State> states = new ArrayList<State>();
+		states.addAll(fa.getStates());
+
+		State initial = fa.getInitialState();
+		State finalState;
+
+		states.remove(initial);
+
+		finalState = fa.getFinalStates().get(0);
+		states.remove(finalState);
+
+		return states;
+	}
+
+	/**
+	 * Creates a new final state for the specified automaton
+	 * 
+	 * @param fa to create the new final state for 
+	 * @return the automaton
+	 */
+	public Finite_Automaton createNewFinalState(Finite_Automaton fa) {
+		ArrayList<State> finalStates = fa.getFinalStates();
+		
+		// state count might be 3, but may be labelled 1-3
+		State finalState = new State("end");
+
+		finalState.setFinal(true);
+
+		createNewFinalState(finalStates, finalState);
+
+		ArrayList<State> states = fa.getStates();
+		states.add(finalState);
+
+		finalStates = new ArrayList<>();
+		finalStates.add(finalState);
+		fa = new Finite_Automaton(fa.getInitialState(), finalStates, states, fa.getInputAlphabet());
+		// adds the new final state to the automaton
+
+		return fa;
 	}
 
 }

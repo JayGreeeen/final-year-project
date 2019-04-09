@@ -6,113 +6,115 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
-import toolbox.Finite_Automata;
+import model.Regex_Converter_Panel;
+import toolbox.Finite_Automaton;
 import toolbox.Tree_Node;
-import toolbox.Tree_Node.ConcatNode;
-import toolbox.Tree_Node.LeafNode;
-import toolbox.Tree_Node.StarNode;
-import toolbox.Tree_Node.UnionNode;
+import toolbox.Tree_Node.Concat_Node;
+import toolbox.Tree_Node.Leaf_Node;
+import toolbox.Tree_Node.Star_Node;
+import toolbox.Tree_Node.Union_Node;
 
+/**
+ * Performs the conversion from a regular expression to a finite automaton
+ * @author Jaydene Green-Stevens
+ *
+ */
 public class Regex_to_FA {
 
 	private Map<Integer, Integer> bracketMap = new HashMap<Integer, Integer>();
 	private char[] chars;
-
-	// take in a regex and turn it into a FA
-	public Finite_Automata convertToFA(String regex) {
-		regex = regex.replace(" ", "");
-		System.out.println("Regex - " + regex);
-		chars = regex.toCharArray();
-
-		boolean valid = validate(regex);
-		if (!valid) {
-			System.out.println("Regex not valid");
-		} else {
-//			System.out.println("building tree");
-			Tree_Node root = (new Tree_Builder(regex)).buildTree();
-
-//			Print_Tree.print(root);
-			Finite_Automata FA = generateFA(root);
-			return FA;
-			
-		}
-		return null;
+	
+	
+	public Regex_to_FA(Regex_Converter_Panel converter){
+	}
+	
+	public Tree_Node convertToTree(String regex){
+		return (new Tree_Builder(regex)).buildTree();
 	}
 
-	private Finite_Automata generateFA(Tree_Node node) {
+	/**
+	 * Generates the FA based on the tree node input
+	 * @param node - parent node in the tree
+	 * @return the automaton
+	 */
+	public Finite_Automaton generateFA(Tree_Node node) {
 
 		// take in the root of the tree and generate the FA
 		Automaton_Builder builder = new Automaton_Builder();
 
-		if (node instanceof LeafNode) {
-			return builder.buildSimpleAutomaton((LeafNode) node);
+		if (node instanceof Leaf_Node) {
+			return builder.buildSimpleAutomaton((Leaf_Node) node);
+			
 		} else {
 			// not a leaf node
 
 			if (node.getLeftChild() != null) {
-//				System.out.println("\tGenerating FA for left child");
-				Finite_Automata leftFA = generateFA(node.getLeftChild());
-//				System.out.println("Left child: " + leftFA);
+				Finite_Automaton leftFA = generateFA(node.getLeftChild());
 
-				if (node instanceof StarNode) {
-//					System.out.println("Adding star operator to left child");
-					return builder.addStarOperator(leftFA);
+				if (node instanceof Star_Node) {
+					
+					Finite_Automaton fa = builder.addStarOperator(leftFA);
+					return fa;
+					
 				} else {
 
 					if (node.getRightChild() != null) {
-//						System.out.println("\tGenerating FA for right child");
-						Finite_Automata rightFA = generateFA(node.getRightChild());
-//						System.out.println("Right child: " + rightFA);
-						
-						if (node instanceof UnionNode) {
+						Finite_Automaton rightFA = generateFA(node.getRightChild());
+
+						if (node instanceof Union_Node) {
 							// use rule 3 to connect child NFAs
-//							System.out.println("\tCombining child nodes with |");
-							return builder.combineWithUnion(leftFA, rightFA);
+							Finite_Automaton fa = builder.combineWithUnion(leftFA, rightFA);
+							return fa;
 							
-						} else if (node instanceof ConcatNode) {
+						} else if (node instanceof Concat_Node) {
 							// use rule 4 to connect child NFAs
-//							System.out.println("\tCombining child nodes with •");
-							return builder.combineWithConcat(leftFA, rightFA);
+							Finite_Automaton fa = builder.combineWithConcat(leftFA, rightFA);
+							return fa;
 						}
-					} else {
-						// no right child - should never be the case
-//						System.out.println("No right child found");
 					}
 				}
 			}
-			// the root node is none of the above - problem 
+			// the root node is none of the above - problem
 			return null;
 		}
 	}
 
-	private boolean validate(String regex) {
+	/**
+	 * Checks to see whether the input regex is valid
+	 * @param regex
+	 * @return the error message, or an empty string if the regex is valid
+	 */
+	public String validate(String regex) {
+		chars = regex.toCharArray();
 		boolean bracketsMatch = validateBrackets(regex);
-		if (!bracketsMatch) {
-			System.out.println("brackets dont match");
-			return false;
+
+		if (bracketsMatch == false) {
+			return "Brackets do not match";
 		}
 
 		boolean validSymbols = validateSymbols(regex);
-		if (!validSymbols) {
-			System.out.println("symbols not valid");
-			return false;
+		if (validSymbols == false) {
+			return "Symbols not valid";
 		}
 
 		boolean validKleene = validateKleeneStar(regex);
-		if (!validKleene) {
-			System.out.println("Use of Kleene star not valid");
-			return false;
+		if (validKleene == false) {
+			return "Use of Kleene star * not valid";
 		}
 
 		boolean validUnion = validateUnion(regex);
-		if (!validUnion) {
-			System.out.println("Use of union not valid");
-			return false;
+		if (validUnion == false) {
+			return "Use of union | not valid";
 		}
 
-		return true;
+		return "";
 	}
 
+	/**
+	 * Validates the symbols used in the regex
+	 * @param regex
+	 * @return if the regex is valid
+	 */
 	private boolean validateSymbols(String regex) {
 		String symbols = regex.replaceAll("[\\w]", "");
 
@@ -126,8 +128,13 @@ public class Regex_to_FA {
 		return false; // not valid - contains other symbols
 	}
 
+	/**
+	 * Validates the use of brackets
+	 * @param regex
+	 * @return false if the brackets do not match
+	 */
 	private boolean validateBrackets(String regex) {
-		if (!regex.contains("(") || !regex.contains(")")) {
+		if (!regex.contains("(") && !regex.contains(")")) {
 			return true;
 		}
 		int openCount = StringUtils.countMatches(regex, '(');
@@ -147,8 +154,8 @@ public class Regex_to_FA {
 						// regex is not valid - too many closing brackets
 					} else {
 						int key = stack.pop();
-						bracketMap.put(key, i);
 						// add the positions of the bracket pair to the map
+						bracketMap.put(key, i);
 					}
 				}
 			}
@@ -156,13 +163,22 @@ public class Regex_to_FA {
 				return true;
 			}
 		}
-		return false; // regex is not valid - too many opening brackets
+		// regex is not valid - too many opening brackets
+		return false; 
 	}
 
+	/**
+	 * Validates the use of the Kleene star in the regex
+	 * @param regex
+	 * @return false if use is not valid
+	 */
 	public boolean validateKleeneStar(String regex) {
 		if (!regex.contains("*")) {
 			return true;
 		}
+		
+		boolean valid = false;
+		
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 
@@ -171,22 +187,31 @@ public class Regex_to_FA {
 					char prevChar = chars[i - 1];
 
 					if (Character.isLetterOrDigit(prevChar)) {
-						return true;
-					}
-					if (prevChar == ')' && chars[i - 2] != '(') {
+						valid = true;
+					} else if (prevChar == ')' && chars[i - 2] != '(') {
 						// cant have the case ()*
-						return true;
+						valid = true;
+					} else {
+						return false;
 					}
 				}
 			}
 		}
-		return false;
+		return valid;
 	}
 
+	/**
+	 * Validates the use of union within the regex
+	 * @param regex
+	 * @return false if use is not valid
+	 */
 	public boolean validateUnion(String regex) {
 		if (!regex.contains("|")) {
 			return true;
 		}
+		
+		boolean valid = false;
+		
 		for (int i = 0; i < chars.length; i++) {
 			char c = chars[i];
 			if (c == '|') {
@@ -196,13 +221,19 @@ public class Regex_to_FA {
 
 					if (charBefore == '*' || charBefore == ')' || Character.isLetterOrDigit(charBefore)) {
 						if (charAfter == '(' || Character.isLetterOrDigit(charAfter)) {
-							return true;
+							valid = true;
+						} else {
+							return false;
 						}
+					} else {
+						return false;
 					}
+				} else {
+					return false;
 				}
 			}
 		}
-		return false;
+		return valid;
 	}
 
 }

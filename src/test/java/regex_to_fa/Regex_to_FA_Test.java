@@ -1,5 +1,14 @@
 package regex_to_fa;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.image.ImageObserver;
+import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -9,8 +18,9 @@ import regex_to_fa.Regex_to_FA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import toolbox.Finite_Automata;
+import toolbox.Finite_Automaton;
 import toolbox.State;
+import view.FA_Drawer;
 
 public class Regex_to_FA_Test {
 	private ArrayList<String> inputAlphabet = new ArrayList<String>();
@@ -28,8 +38,11 @@ public class Regex_to_FA_Test {
 		inputAlphabet.add("a");
 
 		String regex = "a";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
+		
+		// *********
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automaton actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
 
 		State actualInitial = actualFA.getInitialState();
 		State actualFinal = actualFA.getFinalStates().get(0);
@@ -60,8 +73,9 @@ public class Regex_to_FA_Test {
 		inputAlphabet.add(label2);
 
 		String regex = "ab";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automaton actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
 
 		State actualInitial = actualFA.getInitialState();
 		State actualFinal = actualFA.getFinalStates().get(0);
@@ -103,9 +117,10 @@ public class Regex_to_FA_Test {
 		int numStates = 6;
 
 		String regex = "a|b";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
-
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automaton actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
+		
 		System.out.println(actualFA);
 
 		State actualInitial = actualFA.getInitialState();
@@ -147,9 +162,10 @@ public class Regex_to_FA_Test {
 		inputAlphabet.add(label1);
 
 		String regex = "a*";
-		Regex_to_FA converter = new Regex_to_FA();
-		Finite_Automata actualFA = converter.convertToFA(regex);
-
+		Regex_to_FA converter = new Regex_to_FA(null);
+		Finite_Automaton actualFA = null;
+//		Finite_Automata actualFA = converter.convertToFA(regex);
+		
 		System.out.println(actualFA);
 
 		State actualInitial = actualFA.getInitialState();
